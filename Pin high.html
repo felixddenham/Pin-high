@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pin High — daily trivia golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rough:#1f4d2b; --rough2:#173d21; --fairway:#5fa04a; --fairway2:#6fb356;
+    --green:#8fd16a; --sand:#e9d8a6; --cream:#f7f2e4; --ink:#1b2a1f; --muted:#5d6b5f;
+    --flag:#e4483b; --gold:#f2b632; --line:#d9d1bb;
+    --eagle:#e9a521; --birdie:#d9463b; --par:#3c7d3a; --bogey:#3b5b8c; --dbl:#26354f;
+  }
+  *{box-sizing:border-box}
+  html{background:#173d21}
+  html,body{margin:0;min-height:100%}
+  body{
+    font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:radial-gradient(120% 80% at 50% 0%, #2d6a3a 0%, var(--rough) 55%, var(--rough2) 100%);
+    background-attachment:fixed;
+  }
+  body::before{ /* mowing stripes */
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;
+    background:repeating-linear-gradient(90deg,#fff 0 38px,transparent 38px 76px);
+  }
+  .wrap{position:relative;max-width:520px;margin:0 auto;padding:18px 16px 40px}
+  header.top{display:flex;align-items:center;justify-content:space-between;color:var(--cream);margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px;letter-spacing:.2px;cursor:pointer}
+  .brand svg{width:26px;height:26px}
+  .pill{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.12);color:var(--cream);padding:6px 10px;border-radius:99px}
+  .card{background:var(--cream);border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.04)}
+  h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:44px;line-height:1;margin:6px 0 8px;letter-spacing:-.5px}
+  h2{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:24px;line-height:1.15;margin:0}
+  p{line-height:1.5}
+  .lede{color:var(--muted);margin:0 0 18px;font-size:16px}
+  .rules{display:grid;gap:10px;margin:0 0 20px;padding:0;list-style:none}
+  .rules li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.4}
+  .rules .ic{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#e8e1cc;font-size:18px}
+  .ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:4px 0 20px}
+  .ladder div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;font-size:11px;color:var(--muted);line-height:1.25}
+  .ladder b{display:block;font-size:17px;color:var(--ink);font-family:Fraunces,Georgia,serif}
+  .btn{appearance:none;border:0;border-radius:14px;padding:15px 18px;font:700 16px "DM Sans",sans-serif;cursor:pointer;width:100%;transition:transform .08s ease, filter .15s}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--ink);color:var(--cream)}
+  .btn.primary:hover{filter:brightness(1.15)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+  .btn.flagb{background:var(--flag);color:#fff}
+  .row{display:flex;gap:10px}
+  .stack{display:grid;gap:10px}
+  .tiny{font-size:13px;color:var(--muted)}
+  .link{background:none;border:0;color:var(--muted);text-decoration:underline;font:500 14px "DM Sans",sans-serif;cursor:pointer;padding:6px}
+
+  /* hole screen */
+  .holehead{display:flex;justify-content:space-between;align-items:center;color:var(--cream);margin:0 2px 10px}
+  .holehead .h{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:20px}
+  .holehead .meta{font-size:13px;opacity:.85}
+  .topar{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:20px;min-width:44px;text-align:right}
+  .course{position:relative;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.3);margin-bottom:12px;background:var(--rough2)}
+  .course svg{display:block;width:100%;height:auto}
+  .badge{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .badge > div{background:var(--cream);border-radius:22px;padding:12px 26px 14px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:badge .45s cubic-bezier(.2,1.6,.4,1) both;border:3px solid currentColor}
+  .badge .num{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:54px;line-height:1}
+  .badge .nm{font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+  .badge .tp{font-size:13px;color:var(--muted);font-weight:700}
+  .badge .c1{color:var(--gold)} .badge .c2{color:var(--eagle)} .badge .c3{color:var(--birdie)} .badge .c4{color:var(--par)} .badge .c5{color:var(--bogey)} .badge .c6,.badge .c7,.badge .c8{color:var(--dbl)}
+  @keyframes badge{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+  .ob{background:#fde3df;border:1.5px solid var(--flag);color:#7d1f17;border-radius:14px;padding:10px 12px;font-size:15px;line-height:1.4;margin:0 0 12px}
+  .ob b{display:block;font-size:16px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 10px;border-radius:99px;background:#e8e1cc;color:var(--ink);margin-bottom:10px}
+  .chip.pin{background:#fde3df;color:#9b2a20}
+  .prompt{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:26px;line-height:1.15;margin:0 0 14px}
+  .timer{height:8px;background:#e4dcc5;border-radius:99px;overflow:hidden;margin-bottom:14px}
+  .timer i{display:block;height:100%;width:100%;background:var(--par);border-radius:99px;transform-origin:left;transition:background .3s}
+  .timer.warn i{background:var(--flag)}
+  .answer{display:flex;gap:8px}
+  .answer input{flex:1;min-width:0;font:500 18px "DM Sans",sans-serif;padding:14px 14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);outline:none}
+  .answer input:focus{border-color:var(--ink)}
+  .answer .unit{align-self:center;color:var(--muted);font-weight:700;margin-left:-2px}
+  .answer .btn{width:auto;padding:0 20px}
+  .suggest{margin-top:10px;background:#fff6d9;border:1.5px solid var(--gold);border-radius:14px;padding:12px;display:grid;gap:10px;font-size:16px;animation:pop .18s ease-out}
+  .suggest .btn{padding:11px 12px;font-size:15px}
+  @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+  .under{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+  .result{text-align:center;padding-top:6px}
+  .term{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:38px;line-height:1;margin:2px 0 6px}
+  .term.t1{color:var(--gold)} .term.t2{color:var(--eagle)} .term.t3{color:var(--birdie)}
+  .term.t4{color:var(--par)} .term.t5{color:var(--bogey)} .term.t6,.term.t7,.term.t8{color:var(--dbl)}
+  .yours{font-size:16px;margin:0 0 12px}
+  .yours b{font-weight:700}
+  .facts{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;font-size:14px;line-height:1.5;margin:0 0 14px}
+  .facts div+div{margin-top:6px}
+  .facts .k{color:var(--muted);font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;display:block}
+
+  /* scorecard */
+  .sc{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:14px;table-layout:fixed}
+  .sc th,.sc td{border:1px solid var(--line);text-align:center;padding:7px 0}
+  .sc th{background:#ece5d0;font-weight:700;font-size:12px}
+  .sc td:first-child,.sc th:first-child{width:52px;text-align:left;padding-left:8px;font-weight:700;font-size:12px;background:#ece5d0}
+  .mk{display:inline-grid;place-items:center;width:24px;height:24px;font-weight:700;font-family:Fraunces,Georgia,serif}
+  .mk.s1{border-radius:50%;background:var(--gold);color:#fff}
+  .mk.s2{border-radius:50%;box-shadow:0 0 0 1.5px var(--eagle),0 0 0 3.5px #fff,0 0 0 5px var(--eagle)}
+  .mk.s3{border-radius:50%;box-shadow:0 0 0 1.5px var(--birdie)}
+  .mk.s5{box-shadow:0 0 0 1.5px var(--bogey)}
+  .mk.s6,.mk.s7,.mk.s8{box-shadow:0 0 0 1.5px var(--dbl),0 0 0 3.5px #fff,0 0 0 5px var(--dbl)}
+  .total{display:flex;align-items:baseline;justify-content:center;gap:14px;margin:4px 0 2px}
+  .total .big{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:56px;line-height:1}
+  .total .vs{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:26px}
+  .verdict{text-align:center;color:var(--muted);margin:0 0 12px}
+  .share{white-space:pre;font-family:ui-monospace,Menlo,monospace;font-size:14px;background:#fff;border:1px dashed var(--line);border-radius:12px;padding:12px;text-align:center;user-select:all;margin:0 0 10px}
+  .review{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+  .review li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.35;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .review .n{flex:0 0 22px;font-weight:700;color:var(--muted)}
+  .review .q{flex:1}
+  .review .q small{display:block;color:var(--muted)}
+  .hidden{display:none !important}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:10px 16px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+  @media (max-width:380px){ h1{font-size:38px} .prompt{font-size:23px} .term{font-size:32px} }
+</style>
+
+</head>
+<body>
+<style>
+  .wallet{display:flex;gap:8px;margin:0 0 12px}
+  .wallet div{flex:1;background:rgba(255,255,255,.1);color:var(--cream);border-radius:14px;padding:9px 6px;text-align:center;font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:700}
+  .wallet b{display:block;font-family:Fraunces,Georgia,serif;font-size:22px;letter-spacing:0;text-transform:none;line-height:1.1}
+  .sect{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:19px;margin:22px 0 10px}
+  .shop{display:grid;gap:10px}
+  .item{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+  .item .ic{font-size:26px;flex:0 0 36px;text-align:center}
+  .item .tx{flex:1;font-size:14px;line-height:1.35}
+  .item .tx b{display:block;font-size:15px}
+  .item .btn{width:auto;padding:10px 12px;font-size:14px;white-space:nowrap}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stats div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:11px;color:var(--muted);line-height:1.2}
+  .stats b{display:block;font-family:Fraunces,Georgia,serif;font-size:22px;color:var(--ink)}
+  .earn{background:#fff6d9;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:14px;line-height:1.5}
+  .earn .tot{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px}
+  .earn .ln{display:flex;justify-content:space-between}
+  .mull{margin-top:10px}
+  .countdown{text-align:center;color:var(--muted);font-size:14px;margin:12px 0 0}
+  .stars{display:flex;gap:6px;margin:0 0 10px}
+  .stars button{background:none;border:0;font-size:32px;line-height:1;color:#d9d1bb;cursor:pointer;padding:0 2px}
+  .stars button.on{color:var(--gold)}
+  .fb textarea{width:100%;font:400 15px "DM Sans",sans-serif;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);resize:vertical;margin:0 0 10px;outline:none}
+  .fb textarea:focus{border-color:var(--ink)}
+  .rulesbox summary{cursor:pointer;font-weight:700;margin:4px 0 12px;color:var(--muted)}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="brand" id="homeLink">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><line x1="9" y1="3" x2="9" y2="23" stroke="#f7f2e4" stroke-width="2" stroke-linecap="round"/><path d="M10 3 L22 7.5 L10 12 Z" fill="#e4483b"/><ellipse cx="13" cy="23.5" rx="9" ry="2" fill="#8fd16a" opacity=".7"/></svg>
+      Pin High
+    </div>
+    <span class="pill" id="coursePill"></span>
+  </header>
+
+  <div class="wallet" id="wallet">
+    <div>Streak<b id="wStreak">0</b></div>
+    <div>Coins<b id="wCoins">0</b></div>
+    <div>Mulligans<b id="wMull">0</b></div>
+    <div>Rain delays<b id="wRain">0</b></div>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="card">
+    <div class="tiny" id="homeDate"></div>
+    <h1>Pin High</h1>
+    <p class="lede">A daily round of trivia golf. Nine holes, nine questions, par 36. Everyone plays the same course each day.</p>
+    <div class="stack">
+      <button class="btn primary" id="startDaily">Tee off</button>
+      <button class="btn ghost" id="startPractice">Practice round</button>
+    </div>
+    <p class="countdown hidden" id="homeCountdown"></p>
+
+    <details class="rulesbox" id="rulesBox" open>
+      <summary>How to play</summary>
+      <ul class="rules">
+        <li><span class="ic">🔎</span><span><b>Rare-find holes.</b> Name something that fits the prompt. The <i>rarer</i> your correct answer, the fewer shots.</span></li>
+        <li><span class="ic">📍</span><span><b>Closest-to-the-pin holes.</b> Guess a number. The <i>closer</i>, the fewer shots.</span></li>
+        <li><span class="ic">🚫</span><span><b>Wrong answer = out of bounds.</b> Play 3 off the tee: one more go with 2 shots already on the card. Miss again and you pick up with an 8.</span></li>
+        <li><span class="ic">🔄</span><span><b>Mulligan.</b> Out of bounds? Spend a mulligan to replay the hole with no penalty. One per round.</span></li>
+        <li><span class="ic">⏱️</span><span>25 seconds a hole, 15 for a second go.</span></li>
+      </ul>
+      <div class="ladder" aria-label="Rare-find scoring">
+        <div><b>5</b>Obvious</div><div><b>4</b>Familiar</div><div><b>3</b>Rare</div><div><b>2</b>Deep cut</div><div><b>1</b>Hole in one</div>
+      </div>
+    </details>
+
+    <div class="sect">Pro shop</div>
+    <div class="shop">
+      <div class="item"><span class="ic">🔄</span><span class="tx"><b>Mulligan · <span id="costMull"></span> coins</b>Replay an out-of-bounds hole with no penalty. Hold up to <span id="maxMull"></span>.</span><button class="btn primary" id="buyMull">Buy</button></div>
+      <div class="item"><span class="ic">🌧️</span><span class="tx"><b>Rain delay · <span id="costRain"></span> coins</b>Miss a day and your streak survives. Used automatically. Hold up to <span id="maxRain"></span>.</span><button class="btn primary" id="buyRain">Buy</button></div>
+    </div>
+    <p class="tiny" style="margin:10px 0 0">Earn coins on the daily course: ace 50 · eagle 20 · birdie 10 · par 5, plus bonuses for finishing, going under par and keeping your streak alive. Coins can't be bought.</p>
+    <button class="link hidden" id="testCoins" type="button">+300 coins (test mode)</button>
+
+    <div class="sect">Your stats</div>
+    <div class="stats">
+      <div><b id="sPlayed">0</b>Rounds</div>
+      <div><b id="sBest">–</b>Best</div>
+      <div><b id="sAvg">–</b>Average</div>
+      <div><b id="sBestStreak">0</b>Best streak</div>
+    </div>
+  </section>
+
+  <!-- HOLE -->
+  <section id="hole" class="hidden">
+    <div class="holehead">
+      <div><div class="h" id="holeTitle">Hole 1</div><div class="meta" id="holeMeta">Par 4</div></div>
+      <div class="topar" id="runTotal">E</div>
+    </div>
+    <div class="course"><div id="courseBox"></div><div class="badge hidden" id="badge"></div></div>
+    <div class="card">
+      <div id="askPane">
+        <div class="ob hidden" id="obNote"></div>
+        <span class="chip" id="chip">Rare find</span>
+        <p class="prompt" id="prompt"></p>
+        <div class="timer" id="timer"><i id="timerBar"></i></div>
+        <form class="answer" id="answerForm" autocomplete="off">
+          <input id="answerInput" type="text" placeholder="Your answer" autocapitalize="words" spellcheck="false" enterkeyhint="go">
+          <span class="unit" id="unit"></span>
+          <button class="btn primary" type="submit">Swing</button>
+        </form>
+        <div class="suggest hidden" id="suggest">
+          <span>Did you mean <b id="sugName"></b>?</span>
+          <div class="row"><button class="btn primary" type="button" id="sugYes">Yes, swing</button><button class="btn ghost" type="button" id="sugNo">No, retype</button></div>
+        </div>
+        <div class="under"><span class="tiny" id="hint"></span><button class="link" id="skipBtn" type="button">Pick up</button></div>
+      </div>
+      <div id="resultPane" class="result hidden">
+        <div class="term" id="term"></div>
+        <p class="yours" id="yours"></p>
+        <div class="facts" id="facts"></div>
+        <button class="btn primary" id="nextBtn">Next hole</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section id="final" class="card hidden">
+    <div class="tiny" id="finalLabel"></div>
+    <h2>Your scorecard</h2>
+    <table class="sc" id="scorecard"></table>
+    <div class="total"><span class="big" id="finalTotal"></span><span class="vs" id="finalVs"></span></div>
+    <p class="verdict" id="verdict"></p>
+    <div class="earn hidden" id="earn"></div>
+    <div class="share" id="shareText"></div>
+    <div class="stack">
+      <button class="btn flagb" id="copyBtn">Copy result</button>
+      <button class="btn primary hidden" id="replayBtn">Replay today's course (test mode)</button>
+      <button class="btn ghost" id="againBtn">Practice round</button>
+      <button class="btn ghost" id="toHome">Clubhouse</button>
+    </div>
+    <p class="countdown" id="finalCountdown"></p>
+    <div class="fb" id="feedback">
+      <div class="sect" style="margin-top:18px">What did you think?</div>
+      <div class="stars" id="stars"><button type="button" data-n="1" aria-label="1 out of 5">★</button><button type="button" data-n="2" aria-label="2 out of 5">★</button><button type="button" data-n="3" aria-label="3 out of 5">★</button><button type="button" data-n="4" aria-label="4 out of 5">★</button><button type="button" data-n="5" aria-label="5 out of 5">★</button></div>
+      <textarea id="fbText" rows="3" placeholder="Too hard? Too easy? A question you think is wrong? Anything you'd change?"></textarea>
+      <button class="btn primary" id="fbCopy" type="button">Copy feedback to send</button>
+      <p class="tiny" id="fbNote" style="margin:6px 0 0">Copies your score and comments so you can paste them into a message.</p>
+    </div>
+    <ul class="review" id="review"></ul>
+    <p class="tiny" style="margin-top:14px">Rarity is currently an estimate of how often people give each answer.</p>
+  </section>
+</div>
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* Master datasets. Rows are in rough order of how often people would name them (most famous first).
+   Derived prompts inherit that order, which sets the shot count. */
+
+// [name|aliases, continents (space separated: EU AS AF NA SA OC), capital|aliases]
+const COUNTRIES = [
+["United Kingdom|UK|Britain|Great Britain","EU","London"],
+["United States|USA|US|America|United States of America","NA","Washington, D.C.|Washington|Washington DC"],
+["France","EU","Paris"],["Germany","EU","Berlin"],["Spain","EU","Madrid"],["Italy","EU","Rome|Roma"],
+["China","AS","Beijing|Peking"],["Japan","AS","Tokyo"],["Australia","OC","Canberra"],["Canada","NA","Ottawa"],
+["Brazil","SA","Brasilia"],["India","AS","New Delhi|Delhi"],["Russia","EU AS","Moscow"],["Mexico","NA","Mexico City"],
+["Ireland|Republic of Ireland|Eire","EU","Dublin"],["England","EU","London"],["Scotland","EU","Edinburgh"],["Wales","EU","Cardiff"],
+["Argentina","SA","Buenos Aires"],["Egypt","AF","Cairo"],["South Africa","AF","Pretoria|Cape Town|Bloemfontein"],
+["Portugal","EU","Lisbon|Lisboa"],["Netherlands|Holland","EU","Amsterdam"],["Greece","EU","Athens|Athina"],
+["Sweden","EU","Stockholm"],["Norway","EU","Oslo"],["Switzerland","EU","Bern|Berne"],["Belgium","EU","Brussels|Bruxelles"],
+["Poland","EU","Warsaw|Warszawa"],["Turkey|Turkiye","EU AS","Ankara"],["New Zealand","OC","Wellington"],
+["South Korea|Korea|Republic of Korea","AS","Seoul"],["North Korea|DPRK","AS","Pyongyang"],["Thailand","AS","Bangkok"],
+["Denmark","EU","Copenhagen|Kobenhavn"],["Finland","EU","Helsinki"],["Austria","EU","Vienna|Wien"],["Iceland","EU","Reykjavik"],
+["Northern Ireland","EU","Belfast"],["Nigeria","AF","Abuja"],["Kenya","AF","Nairobi"],["Jamaica","NA","Kingston"],["Cuba","NA","Havana"],
+["Israel","AS","Jerusalem"],["Saudi Arabia","AS","Riyadh"],["Iran","AS","Tehran"],["Iraq","AS","Baghdad"],["Pakistan","AS","Islamabad"],
+["Afghanistan","AS","Kabul"],["Indonesia","AS","Jakarta|Nusantara"],["Philippines","AS","Manila"],["Vietnam|Viet Nam","AS","Hanoi"],
+["Ukraine","EU","Kyiv|Kiev"],["Colombia","SA","Bogota"],["Peru","SA","Lima"],["Chile","SA","Santiago"],["Morocco","AF","Rabat"],
+["Ghana","AF","Accra"],["Ethiopia","AF","Addis Ababa"],["Czech Republic|Czechia","EU","Prague|Praha"],["Hungary","EU","Budapest"],
+["Croatia","EU","Zagreb"],["Singapore","AS","Singapore"],["Malaysia","AS","Kuala Lumpur|Putrajaya"],
+["United Arab Emirates|UAE","AS","Abu Dhabi"],["Qatar","AS","Doha"],["Venezuela","SA","Caracas"],["Uruguay","SA","Montevideo"],
+["Romania","EU","Bucharest"],["Bulgaria","EU","Sofia"],["Serbia","EU","Belgrade"],["Algeria","AF","Algiers"],["Tunisia","AF","Tunis"],
+["Libya","AF","Tripoli"],["Syria","AS","Damascus"],["Lebanon","AS","Beirut"],["Jordan","AS","Amman"],["Nepal","AS","Kathmandu"],
+["Bangladesh","AS","Dhaka"],["Sri Lanka","AS","Sri Jayawardenepura Kotte|Kotte|Colombo"],["Mongolia","AS","Ulaanbaatar|Ulan Bator"],
+["Taiwan","AS","Taipei"],["Ecuador","SA","Quito"],["Bolivia","SA","Sucre|La Paz"],["Paraguay","SA","Asuncion"],
+["Zimbabwe","AF","Harare"],["Uganda","AF","Kampala"],["Tanzania","AF","Dodoma"],["Cameroon","AF","Yaounde"],["Senegal","AF","Dakar"],
+["Madagascar","AF","Antananarivo"],["Somalia","AF","Mogadishu"],["Sudan","AF","Khartoum"],["Rwanda","AF","Kigali"],
+["Luxembourg","EU","Luxembourg|Luxembourg City"],["Monaco","EU","Monaco|Monaco-Ville"],["Vatican City|Vatican|Holy See","EU","Vatican City|Vatican"],
+["Malta","EU","Valletta"],["Cyprus","EU AS","Nicosia"],["Estonia","EU","Tallinn"],["Latvia","EU","Riga"],["Lithuania","EU","Vilnius"],
+["Slovakia","EU","Bratislava"],["Slovenia","EU","Ljubljana"],["Belarus","EU","Minsk"],["Albania","EU","Tirana"],
+["Bosnia and Herzegovina|Bosnia","EU","Sarajevo"],["Montenegro","EU","Podgorica"],["North Macedonia|Macedonia","EU","Skopje"],
+["Moldova","EU","Chisinau"],["Kosovo","EU","Pristina|Prishtina"],["San Marino","EU","San Marino"],["Andorra","EU","Andorra la Vella"],
+["Liechtenstein","EU","Vaduz"],["Georgia","EU AS","Tbilisi"],["Armenia","EU AS","Yerevan"],["Azerbaijan","EU AS","Baku"],
+["Kazakhstan","AS EU","Astana|Nur-Sultan"],["Uzbekistan","AS","Tashkent"],["Turkmenistan","AS","Ashgabat"],["Kyrgyzstan","AS","Bishkek"],
+["Tajikistan","AS","Dushanbe"],["Myanmar|Burma","AS","Naypyidaw|Nay Pyi Taw"],["Cambodia","AS","Phnom Penh"],["Laos","AS","Vientiane"],
+["Bhutan","AS","Thimphu"],["Maldives","AS","Male"],["Brunei","AS","Bandar Seri Begawan"],["East Timor|Timor-Leste","AS","Dili"],
+["Kuwait","AS","Kuwait City"],["Bahrain","AS","Manama"],["Oman","AS","Muscat"],["Yemen","AS","Sanaa"],["Palestine","AS","Ramallah|East Jerusalem"],
+["Panama","NA","Panama City"],["Costa Rica","NA","San Jose"],["Guatemala","NA","Guatemala City"],["Honduras","NA","Tegucigalpa"],
+["El Salvador","NA","San Salvador"],["Nicaragua","NA","Managua"],["Belize","NA","Belmopan"],["Bahamas|The Bahamas","NA","Nassau"],
+["Barbados","NA","Bridgetown"],["Haiti","NA","Port-au-Prince"],["Dominican Republic","NA","Santo Domingo"],
+["Trinidad and Tobago","NA","Port of Spain"],["Grenada","NA","St. George's|Saint George's"],["Saint Lucia|St Lucia","NA","Castries"],
+["Antigua and Barbuda|Antigua","NA","St. John's|Saint John's"],["Dominica","NA","Roseau"],
+["Saint Vincent and the Grenadines|St Vincent and the Grenadines|St Vincent","NA","Kingstown"],
+["Saint Kitts and Nevis|St Kitts and Nevis|St Kitts","NA","Basseterre"],["Guyana","SA","Georgetown"],["Suriname","SA","Paramaribo"],
+["Fiji","OC","Suva"],["Papua New Guinea|PNG","OC","Port Moresby"],["Samoa","OC","Apia"],["Tonga","OC","Nuku'alofa"],
+["Vanuatu","OC","Port Vila"],["Solomon Islands","OC","Honiara"],["Kiribati","OC","Tarawa|South Tarawa"],
+["Micronesia|Federated States of Micronesia","OC","Palikir"],["Marshall Islands","OC","Majuro"],["Palau","OC","Ngerulmud"],
+["Tuvalu","OC","Funafuti"],["Nauru","OC","Yaren"],
+["Ivory Coast|Cote d'Ivoire","AF","Yamoussoukro"],["Democratic Republic of the Congo|DR Congo|DRC|Congo DR|Zaire","AF","Kinshasa"],
+["Republic of the Congo|Congo|Congo-Brazzaville","AF","Brazzaville"],["Zambia","AF","Lusaka"],["Angola","AF","Luanda"],
+["Mozambique","AF","Maputo"],["Botswana","AF","Gaborone"],["Namibia","AF","Windhoek"],["Mali","AF","Bamako"],["Niger","AF","Niamey"],
+["Chad","AF","N'Djamena"],["Sierra Leone","AF","Freetown"],["Liberia","AF","Monrovia"],["Malawi","AF","Lilongwe"],
+["South Sudan","AF","Juba"],["Gambia|The Gambia","AF","Banjul"],["Eritrea","AF","Asmara"],["Burkina Faso","AF","Ouagadougou"],
+["Benin","AF","Porto-Novo"],["Togo","AF","Lome"],["Guinea","AF","Conakry"],["Mauritius","AF","Port Louis"],["Seychelles","AF","Victoria"],
+["Lesotho","AF","Maseru"],["Eswatini|Swaziland","AF","Mbabane|Lobamba"],["Gabon","AF","Libreville"],["Burundi","AF","Gitega|Bujumbura"],
+["Djibouti","AF","Djibouti"],["Mauritania","AF","Nouakchott"],["Central African Republic|CAR","AF","Bangui"],
+["Cape Verde|Cabo Verde","AF","Praia"],["Equatorial Guinea","AF","Malabo"],["Guinea-Bissau|Guinea Bissau","AF","Bissau"],
+["Comoros","AF","Moroni"],["Sao Tome and Principe|Sao Tome","AF","Sao Tome"]
+];
+
+// [name|aliases, symbol] in fame order
+const ELEMENTS = [
+["Oxygen","O"],["Hydrogen","H"],["Carbon","C"],["Gold","Au"],["Iron","Fe"],["Nitrogen","N"],["Helium","He"],["Silver","Ag"],
+["Copper","Cu"],["Sodium","Na"],["Calcium","Ca"],["Chlorine","Cl"],["Uranium","U"],["Lead","Pb"],["Aluminium|Aluminum","Al"],
+["Zinc","Zn"],["Potassium","K"],["Magnesium","Mg"],["Neon","Ne"],["Mercury","Hg"],["Lithium","Li"],["Platinum","Pt"],
+["Sulfur|Sulphur","S"],["Silicon","Si"],["Plutonium","Pu"],["Tin","Sn"],["Nickel","Ni"],["Phosphorus","P"],["Fluorine","F"],
+["Argon","Ar"],["Titanium","Ti"],["Iodine","I"],["Radium","Ra"],["Cobalt","Co"],["Chromium","Cr"],["Tungsten","W"],["Boron","B"],
+["Krypton","Kr"],["Xenon","Xe"],["Radon","Rn"],["Beryllium","Be"],["Manganese","Mn"],["Arsenic","As"],["Bromine","Br"],
+["Barium","Ba"],["Caesium|Cesium","Cs"],["Strontium","Sr"],["Bismuth","Bi"],["Cadmium","Cd"],["Palladium","Pd"],["Antimony","Sb"],
+["Selenium","Se"],["Polonium","Po"],["Vanadium","V"],["Gallium","Ga"],["Germanium","Ge"],["Zirconium","Zr"],["Molybdenum","Mo"],
+["Iridium","Ir"],["Osmium","Os"],["Thorium","Th"],["Francium","Fr"],["Rubidium","Rb"],["Scandium","Sc"],["Yttrium","Y"],
+["Neodymium","Nd"],["Tellurium","Te"],["Indium","In"],["Tantalum","Ta"],["Rhodium","Rh"],["Ruthenium","Ru"],["Niobium","Nb"],
+["Hafnium","Hf"],["Rhenium","Re"],["Thallium","Tl"],["Astatine","At"],["Actinium","Ac"],["Protactinium","Pa"],["Neptunium","Np"],
+["Americium","Am"],["Curium","Cm"],["Berkelium","Bk"],["Californium","Cf"],["Einsteinium","Es"],["Fermium","Fm"],
+["Mendelevium","Md"],["Nobelium","No"],["Lawrencium","Lr"],["Rutherfordium","Rf"],["Dubnium","Db"],["Seaborgium","Sg"],
+["Bohrium","Bh"],["Hassium","Hs"],["Meitnerium","Mt"],["Darmstadtium","Ds"],["Roentgenium","Rg"],["Copernicium","Cn"],
+["Nihonium","Nh"],["Flerovium","Fl"],["Moscovium","Mc"],["Livermorium","Lv"],["Tennessine","Ts"],["Oganesson","Og"],
+["Lanthanum","La"],["Cerium","Ce"],["Praseodymium","Pr"],["Promethium","Pm"],["Samarium","Sm"],["Europium","Eu"],
+["Gadolinium","Gd"],["Terbium","Tb"],["Dysprosium","Dy"],["Holmium","Ho"],["Erbium","Er"],["Thulium","Tm"],["Ytterbium","Yb"],
+["Lutetium","Lu"],["Technetium","Tc"]
+];
+
+// [state, capital] in state-fame order
+const STATES = [
+["California","Sacramento"],["Texas","Austin"],["Florida","Tallahassee"],["New York","Albany"],["Alaska","Juneau"],["Hawaii","Honolulu"],
+["Washington","Olympia"],["Nevada","Carson City"],["Arizona","Phoenix"],["Colorado","Denver"],["Ohio","Columbus"],["Georgia","Atlanta"],
+["Michigan","Lansing"],["Illinois","Springfield"],["Oregon","Salem"],["Utah","Salt Lake City"],["Massachusetts","Boston"],
+["New Jersey","Trenton"],["Pennsylvania","Harrisburg"],["Virginia","Richmond"],["Tennessee","Nashville"],["Louisiana","Baton Rouge"],
+["Kentucky","Frankfort"],["Montana","Helena"],["Alabama","Montgomery"],["North Carolina","Raleigh"],["South Carolina","Columbia"],
+["Mississippi","Jackson"],["Missouri","Jefferson City"],["Minnesota","Saint Paul|St Paul"],["Wisconsin","Madison"],
+["Indiana","Indianapolis"],["Iowa","Des Moines"],["Kansas","Topeka"],["Oklahoma","Oklahoma City"],["Arkansas","Little Rock"],
+["Nebraska","Lincoln"],["Idaho","Boise"],["Wyoming","Cheyenne"],["New Mexico","Santa Fe"],["Maine","Augusta"],["Vermont","Montpelier"],
+["New Hampshire","Concord"],["Connecticut","Hartford"],["Rhode Island","Providence"],["Maryland","Annapolis"],["Delaware","Dover"],
+["West Virginia","Charleston"],["North Dakota","Bismarck"],["South Dakota","Pierre"]
+];
+// capitals in rough fame order (for the capitals prompt)
+const STATE_CAPITAL_FAME = ["Boston","Atlanta","Honolulu","Austin","Sacramento","Denver","Phoenix","Nashville","Salt Lake City","Indianapolis","Columbus","Oklahoma City","Albany","Tallahassee","Baton Rouge","Richmond","Little Rock","Santa Fe","Juneau","Carson City","Olympia","Springfield","Raleigh","Providence","Madison","Des Moines","Saint Paul","Jackson","Montgomery","Columbia","Lincoln","Charleston","Hartford","Annapolis","Harrisburg","Trenton","Boise","Cheyenne","Helena","Lansing","Topeka","Dover","Frankfort","Jefferson City","Bismarck","Concord","Augusta","Montpelier","Pierre","Salem"];
+
+/* Hand-written rare-find prompts. Answers separated by ";" in rough most-to-least-common order, aliases with "|".
+   theme: optional date (MM-DD) — prompt is held back for that day only. */
+const HAND = [
+["constellations","Name one of the 88 constellations","Orion;Ursa Major|Great Bear;Ursa Minor|Little Bear;Cassiopeia;Leo;Scorpius|Scorpio;Gemini;Taurus;Aries;Virgo;Sagittarius;Capricornus|Capricorn;Aquarius;Pisces;Cancer;Libra;Draco;Pegasus;Andromeda;Cygnus;Perseus;Hercules;Crux|Southern Cross;Lyra;Canis Major;Aquila;Centaurus;Phoenix;Hydra;Cepheus;Bootes;Auriga;Canis Minor;Ophiuchus;Lupus;Carina;Corona Borealis;Delphinus;Lynx;Monoceros;Eridanus;Cetus;Columba;Corvus;Lepus;Vela;Puppis;Serpens;Sagitta;Triangulum;Leo Minor;Pavo;Grus;Tucana;Dorado;Antlia;Apus;Ara;Caelum;Camelopardalis;Canes Venatici;Chamaeleon;Circinus;Coma Berenices;Corona Australis;Crater;Equuleus;Fornax;Horologium;Hydrus;Indus;Lacerta;Mensa;Microscopium;Musca;Norma;Octans;Pictor;Piscis Austrinus;Pyxis;Reticulum;Sculptor;Scutum;Sextans;Telescopium;Triangulum Australe;Volans;Vulpecula"],
+["pl-clubs","Name a club that has played in the Premier League","Manchester United|Man United|Man Utd|Man U;Liverpool;Arsenal;Chelsea;Manchester City|Man City;Tottenham Hotspur|Tottenham|Spurs;Newcastle United|Newcastle;Everton;West Ham United|West Ham;Aston Villa|Villa;Leeds United|Leeds;Leicester City|Leicester;Southampton;Wolverhampton Wanderers|Wolves;Crystal Palace|Palace;Brighton and Hove Albion|Brighton;Fulham;Nottingham Forest|Forest;Sunderland;Brentford;Bournemouth|AFC Bournemouth;Burnley;Norwich City|Norwich;Middlesbrough|Boro;Stoke City|Stoke;Blackburn Rovers|Blackburn;West Bromwich Albion|West Brom;Watford;Ipswich Town|Ipswich;Sheffield United;Birmingham City|Birmingham;Bolton Wanderers|Bolton;Wigan Athletic|Wigan;Portsmouth;Queens Park Rangers|QPR;Swansea City|Swansea;Hull City|Hull;Derby County|Derby;Cardiff City|Cardiff;Reading;Charlton Athletic|Charlton;Sheffield Wednesday;Coventry City|Coventry;Luton Town|Luton;Huddersfield Town|Huddersfield;Wimbledon;Blackpool;Bradford City|Bradford;Oldham Athletic|Oldham;Barnsley;Swindon Town|Swindon"],
+["shakespeare","Name a play by William Shakespeare","Romeo and Juliet;Hamlet;Macbeth;Othello;King Lear;A Midsummer Night's Dream|Midsummer Night's Dream;The Tempest;Twelfth Night;Much Ado About Nothing;Julius Caesar;The Merchant of Venice;The Taming of the Shrew;As You Like It;Richard III;Henry V;Antony and Cleopatra;The Winter's Tale;The Comedy of Errors;Richard II;Henry IV Part 1|Henry IV;Henry IV Part 2;Henry VIII;Coriolanus;Titus Andronicus;The Merry Wives of Windsor;Measure for Measure;All's Well That Ends Well;Love's Labour's Lost;The Two Gentlemen of Verona;Troilus and Cressida;King John;Cymbeline;Timon of Athens;Pericles;Henry VI Part 1|Henry VI;Henry VI Part 2;Henry VI Part 3;The Two Noble Kinsmen"],
+["monopoly","Name a property, station or utility on the UK Monopoly board","Mayfair;Park Lane;Old Kent Road;Oxford Street;Bond Street;Regent Street;Trafalgar Square;Leicester Square;Piccadilly;Whitechapel Road|Whitechapel;King's Cross Station|Kings Cross;Pall Mall;Fleet Street;Strand;The Angel Islington|Angel Islington|The Angel;Liverpool Street Station|Liverpool Street;Marylebone Station|Marylebone;Fenchurch Street Station|Fenchurch Street;Coventry Street;Euston Road;Whitehall;Bow Street;Pentonville Road;Northumberland Avenue;Marlborough Street;Vine Street;Electric Company;Water Works|Waterworks"],
+["greek-gods","Name a god or goddess from Greek mythology","Zeus;Poseidon;Athena;Apollo;Aphrodite;Hades;Hera;Ares;Hermes;Artemis;Dionysus;Hephaestus;Demeter;Persephone;Eros;Nike;Gaia;Hestia;Pan;Helios;Cronus|Kronos;Hecate;Nemesis;Selene;Morpheus;Iris;Hebe;Eos;Hypnos;Thanatos;Nyx;Uranus|Ouranos;Rhea;Tyche;Asclepius;Atlas;Prometheus;Hyperion;Themis;Mnemosyne;Oceanus;Eris;Triton;Harmonia;Phobos;Deimos;Boreas;Zephyrus;Aether;Erebus;Plutus;Notus;Eurus"],
+["bond-films","Name an official (Eon) James Bond film","Skyfall;Goldfinger;Casino Royale;GoldenEye;Dr. No|Dr No|Doctor No;No Time to Die;Spectre;Quantum of Solace;Thunderball;Moonraker;Live and Let Die;From Russia with Love;The Spy Who Loved Me;Die Another Day;Tomorrow Never Dies;The World Is Not Enough;You Only Live Twice;Octopussy;For Your Eyes Only;A View to a Kill;The Man with the Golden Gun;Diamonds Are Forever;Licence to Kill|License to Kill;The Living Daylights;On Her Majesty's Secret Service|OHMSS"],
+["bond-actors","Name an actor who has played James Bond on film","Sean Connery|Connery;Daniel Craig|Craig;Roger Moore|Moore;Pierce Brosnan|Brosnan;Timothy Dalton|Dalton;George Lazenby|Lazenby;David Niven|Niven;Barry Nelson"],
+["beatles","Name a member of the Beatles (any line-up)","John Lennon|Lennon|John;Paul McCartney|McCartney|Paul;Ringo Starr|Ringo|Starr;George Harrison|Harrison|George;Pete Best|Best;Stuart Sutcliffe|Sutcliffe|Stu Sutcliffe"],
+["spice-girls","Name a Spice Girl (real name or nickname)","Victoria Beckham|Posh Spice|Posh|Victoria Adams;Geri Halliwell|Ginger Spice|Ginger|Geri Horner;Mel B|Scary Spice|Scary|Melanie Brown;Emma Bunton|Baby Spice|Baby;Mel C|Sporty Spice|Sporty|Melanie Chisholm"],
+["one-direction","Name a member of One Direction","Harry Styles|Styles|Harry;Zayn Malik|Zayn|Malik;Niall Horan|Niall|Horan;Louis Tomlinson|Louis|Tomlinson;Liam Payne|Liam|Payne"],
+["take-that","Name a member of Take That (any line-up)","Gary Barlow|Barlow;Robbie Williams|Robbie;Mark Owen|Owen;Howard Donald|Howard;Jason Orange|Jason"],
+["queen-band","Name a member of the band Queen","Freddie Mercury|Freddie|Mercury;Brian May|May;Roger Taylor;John Deacon|Deacon"],
+["pixar","Name a Pixar feature film","Toy Story;Finding Nemo;The Incredibles;Monsters, Inc.|Monsters Inc;Up;Cars;Inside Out;Toy Story 3;Ratatouille;WALL-E|Wall E|Walle;Coco;Toy Story 2;Finding Dory;Brave;Toy Story 4;Incredibles 2;Monsters University;A Bug's Life;Inside Out 2;Cars 2;Soul;Cars 3;Luca;Turning Red;Lightyear;Onward;The Good Dinosaur;Elemental;Elio"],
+["mcu","Name a film in the Marvel Cinematic Universe","Avengers: Endgame|Endgame;Iron Man;The Avengers|Avengers Assemble;Avengers: Infinity War|Infinity War;Black Panther;Guardians of the Galaxy;Captain America: Civil War|Civil War;Thor: Ragnarok|Ragnarok;Spider-Man: No Way Home|No Way Home;Iron Man 2;Iron Man 3;Thor;Captain America: The First Avenger|The First Avenger;Captain America: The Winter Soldier|The Winter Soldier;Doctor Strange;Spider-Man: Homecoming|Homecoming;Ant-Man|Ant Man;Captain Marvel;Avengers: Age of Ultron|Age of Ultron;Guardians of the Galaxy Vol. 2;Deadpool & Wolverine|Deadpool and Wolverine;Black Widow;Spider-Man: Far From Home|Far From Home;Thor: The Dark World|The Dark World;The Incredible Hulk;Shang-Chi and the Legend of the Ten Rings|Shang-Chi;Eternals;Doctor Strange in the Multiverse of Madness;Thor: Love and Thunder|Love and Thunder;Black Panther: Wakanda Forever|Wakanda Forever;Guardians of the Galaxy Vol. 3;Ant-Man and the Wasp;Ant-Man and the Wasp: Quantumania|Quantumania;The Marvels;Captain America: Brave New World|Brave New World;Thunderbolts*|Thunderbolts;The Fantastic Four: First Steps|Fantastic Four: First Steps"],
+["star-wars","Name a live-action Star Wars film","A New Hope|Star Wars;The Empire Strikes Back|Empire Strikes Back;Return of the Jedi;The Phantom Menace;Revenge of the Sith;Attack of the Clones;The Force Awakens;The Last Jedi;The Rise of Skywalker;Rogue One;Solo"],
+["harry-potter","Name a Harry Potter book (by its UK title)","Harry Potter and the Philosopher's Stone|Philosopher's Stone|Sorcerer's Stone;Harry Potter and the Deathly Hallows|Deathly Hallows;Harry Potter and the Chamber of Secrets|Chamber of Secrets;Harry Potter and the Prisoner of Azkaban|Prisoner of Azkaban;Harry Potter and the Goblet of Fire|Goblet of Fire;Harry Potter and the Half-Blood Prince|Half-Blood Prince|Half Blood Prince;Harry Potter and the Order of the Phoenix|Order of the Phoenix"],
+["doctor-who","Name an actor who has played the Doctor in Doctor Who","David Tennant|Tennant;Matt Smith;Peter Capaldi|Capaldi;Jodie Whittaker|Whittaker;Christopher Eccleston|Eccleston;Tom Baker;Ncuti Gatwa|Gatwa;Peter Davison|Davison;Jon Pertwee|Pertwee;William Hartnell|Hartnell;Patrick Troughton|Troughton;Sylvester McCoy|McCoy;Colin Baker;Paul McGann|McGann;John Hurt;Jo Martin"],
+["dwarfs","Name one of the Seven Dwarfs from Disney's Snow White","Dopey;Grumpy;Sleepy;Happy;Sneezy;Bashful;Doc"],
+["reindeer","Name one of Santa's reindeer","Rudolph;Dasher;Dancer;Prancer;Vixen;Comet;Cupid;Blitzen;Donner|Donder","12-25"],
+["roman-gods","Name a god or goddess from Roman mythology","Jupiter;Mars;Venus;Neptune;Mercury;Pluto;Juno;Minerva;Cupid;Apollo;Diana;Saturn;Vulcan;Bacchus;Janus;Ceres;Vesta;Aurora;Fortuna;Faunus;Proserpina;Sol;Luna;Bellona;Victoria;Terminus;Quirinus;Flora;Pomona;Somnus"],
+["norse-gods","Name a god or goddess from Norse mythology","Thor;Odin;Loki;Freya|Freyja;Frigg|Frigga;Baldur|Balder|Baldr;Tyr;Heimdall;Hel;Freyr|Frey;Njord;Idun|Idunn;Bragi;Vidar;Vali;Hodr|Hod;Sif;Forseti;Ullr|Ull;Skadi;Mimir;Eir"],
+["seven-wonders","Name one of the Seven Wonders of the Ancient World","Great Pyramid of Giza|Pyramids of Giza|Great Pyramid|Pyramids;Hanging Gardens of Babylon|Hanging Gardens;Colossus of Rhodes|Colossus;Lighthouse of Alexandria|Pharos of Alexandria;Statue of Zeus at Olympia|Statue of Zeus;Temple of Artemis at Ephesus|Temple of Artemis;Mausoleum at Halicarnassus|Mausoleum of Halicarnassus"],
+["dickens","Name a novel by Charles Dickens","Oliver Twist;A Christmas Carol;Great Expectations;David Copperfield;A Tale of Two Cities;Bleak House;Hard Times;The Pickwick Papers|Pickwick Papers;Nicholas Nickleby;Little Dorrit;The Old Curiosity Shop;Our Mutual Friend;Dombey and Son;Martin Chuzzlewit;The Mystery of Edwin Drood|Edwin Drood;Barnaby Rudge"],
+["austen","Name a novel by Jane Austen","Pride and Prejudice;Emma;Sense and Sensibility;Persuasion;Mansfield Park;Northanger Abbey;Sanditon;Lady Susan;The Watsons"],
+["christie","Name a recurring detective created by Agatha Christie","Hercule Poirot|Poirot;Miss Marple|Jane Marple|Marple;Tommy and Tuppence|Tuppence|Tommy;Ariadne Oliver;Parker Pyne;Harley Quin|Mr Quin;Superintendent Battle"],
+["uk-pms","Name a UK prime minister who took office between 1945 and 2024","Margaret Thatcher|Thatcher;Tony Blair|Blair;Winston Churchill|Churchill;Boris Johnson|Johnson;David Cameron|Cameron;Theresa May|May;Gordon Brown|Brown;Liz Truss|Truss;Rishi Sunak|Sunak;Keir Starmer|Starmer;John Major|Major;Clement Attlee|Attlee;Harold Wilson|Wilson;Edward Heath|Ted Heath|Heath;James Callaghan|Jim Callaghan|Callaghan;Harold Macmillan|Macmillan;Anthony Eden|Eden;Alec Douglas-Home|Douglas-Home|Alec Douglas Home"],
+["us-presidents","Name a President of the United States","Abraham Lincoln|Lincoln;George Washington|Washington;Barack Obama|Obama;Donald Trump|Trump;John F. Kennedy|JFK|Kennedy|John Kennedy;Joe Biden|Biden;Franklin D. Roosevelt|FDR|Franklin Roosevelt;Ronald Reagan|Reagan;Bill Clinton|Clinton;Theodore Roosevelt|Teddy Roosevelt;Richard Nixon|Nixon;George W. Bush|George Bush|Bush;Thomas Jefferson|Jefferson;Jimmy Carter|Carter;George H. W. Bush;Dwight D. Eisenhower|Eisenhower;Harry S. Truman|Truman;Lyndon B. Johnson|LBJ|Lyndon Johnson;Gerald Ford|Ford;John Adams;Andrew Jackson|Jackson;Ulysses S. Grant|Grant;James Madison|Madison;Woodrow Wilson;James Monroe|Monroe;Herbert Hoover|Hoover;John Quincy Adams;William McKinley|McKinley;Calvin Coolidge|Coolidge;William Howard Taft|Taft;Warren G. Harding|Harding;James K. Polk|Polk;Grover Cleveland|Cleveland;Andrew Johnson;James Garfield|Garfield;Martin Van Buren|Van Buren;William Henry Harrison;Benjamin Harrison;Zachary Taylor;John Tyler|Tyler;Millard Fillmore|Fillmore;Franklin Pierce|Pierce;James Buchanan|Buchanan;Rutherford B. Hayes|Hayes;Chester A. Arthur|Chester Arthur"],
+["henry-wives","Name one of Henry VIII's six wives","Anne Boleyn|Boleyn;Catherine of Aragon|Katherine of Aragon;Jane Seymour|Seymour;Anne of Cleves;Catherine Howard|Katherine Howard;Catherine Parr|Katherine Parr|Parr"],
+["monarchs-1714","Name a British monarch since 1714 (e.g. George III)","Elizabeth II|Queen Elizabeth II;Victoria|Queen Victoria;Charles III|King Charles III;George VI;George III;Edward VIII;George V;Edward VII;George I;George II;George IV;William IV"],
+["tudors","Name a Tudor monarch","Henry VIII;Elizabeth I;Henry VII;Mary I|Bloody Mary;Edward VI;Lady Jane Grey|Jane Grey"],
+["moonwalkers","Name an astronaut who walked on the Moon","Neil Armstrong|Armstrong;Buzz Aldrin|Aldrin;Alan Shepard|Shepard;Pete Conrad|Conrad;Gene Cernan|Eugene Cernan|Cernan;Jim Irwin|James Irwin|Irwin;David Scott|Dave Scott;John Young;Charlie Duke|Charles Duke|Duke;Alan Bean|Bean;Edgar Mitchell|Mitchell;Harrison Schmitt|Jack Schmitt|Schmitt"],
+["g7","Name a G7 country","United States|USA|US|America;United Kingdom|UK|Britain;France;Germany;Japan;Canada;Italy"],
+["planets","Name a planet or dwarf planet in our solar system","Mars;Jupiter;Earth;Saturn;Venus;Mercury;Neptune;Uranus;Pluto;Ceres;Eris;Haumea;Makemake"],
+["noble-gases","Name a noble gas","Helium;Neon;Argon;Krypton;Xenon;Radon;Oganesson"],
+["odd-symbols","Name an element whose symbol doesn't start with the first letter of its English name","Iron;Gold;Sodium;Lead;Silver;Potassium;Mercury;Tin;Tungsten;Antimony"],
+["si-units","Name an SI unit (base or derived)","Metre|Meter;Kilogram;Second;Kelvin;Ampere|Amp;Watt;Volt;Newton;Joule;Mole;Hertz;Pascal;Ohm;Candela;Coulomb;Tesla;Farad;Lumen;Lux;Henry;Weber;Siemens;Becquerel;Sievert;Gray;Katal;Radian;Steradian;Degree Celsius|Celsius"],
+["metric-prefixes","Name a metric (SI) prefix","Kilo;Mega;Milli;Centi;Giga;Micro;Nano;Tera;Deci;Pico;Peta;Hecto;Deca|Deka;Femto;Exa;Atto;Zetta;Yotta;Zepto;Yocto;Ronna;Quetta;Ronto;Quecto"],
+["nato","Name a word from the NATO phonetic alphabet","Alpha|Alfa;Bravo;Charlie;Delta;Echo;Foxtrot;Tango;Zulu;Victor;Golf;Hotel;Romeo;Juliet|Juliett;Oscar;Sierra;Kilo;India;Lima;Mike;November;Papa;Quebec;Uniform;Whiskey|Whisky;X-ray|Xray;Yankee"],
+["greek-letters","Name a letter of the Greek alphabet","Alpha;Beta;Delta;Gamma;Omega;Pi;Sigma;Theta;Lambda;Epsilon;Mu;Zeta;Omicron;Kappa;Rho;Tau;Phi;Psi;Chi;Eta;Iota;Nu;Xi;Upsilon"],
+["clouds","Name one of the ten main types (genera) of cloud","Cumulus;Cirrus;Stratus;Cumulonimbus;Nimbostratus;Cirrostratus;Altocumulus;Stratocumulus;Altostratus;Cirrocumulus"],
+["atmosphere","Name a layer of Earth's atmosphere","Troposphere;Stratosphere;Ozone layer;Mesosphere;Thermosphere;Ionosphere;Exosphere"],
+["apes","Name a type of ape","Gorilla;Chimpanzee|Chimp;Orangutan;Bonobo;Human;Gibbon;Siamang"],
+["poker","Name a poker hand","Royal flush;Full house;Flush;Straight;Four of a kind;Straight flush;Three of a kind;Two pair;Pair|One pair;High card"],
+["cluedo","Name a classic Cluedo suspect, weapon or room","Colonel Mustard|Mustard;Miss Scarlett|Miss Scarlet|Scarlett;Professor Plum|Plum;Candlestick;Rope;Mrs Peacock|Peacock;Reverend Green|Mr Green|Green;Mrs White|White;Lead Piping|Lead Pipe;Dagger|Knife;Revolver;Spanner|Wrench;Library;Kitchen;Ballroom;Conservatory;Billiard Room;Study;Lounge;Hall;Dining Room;Dr Orchid|Orchid"],
+["zodiac","Name a sign of the Western zodiac","Leo;Scorpio;Aries;Gemini;Taurus;Virgo;Cancer;Libra;Sagittarius;Pisces;Aquarius;Capricorn"],
+["chinese-zodiac","Name an animal of the Chinese zodiac","Dragon;Rat;Tiger;Snake;Horse;Monkey;Ox;Rabbit;Dog;Pig;Rooster;Goat|Sheep|Ram"],
+["strictly","Name a dance performed on Strictly Come Dancing","Waltz;Tango;Cha-cha-cha|Cha cha|Cha cha cha;Foxtrot;Quickstep;Rumba;Samba;Paso doble;Jive;Charleston;Viennese waltz;Salsa;Argentine tango;American Smooth;Contemporary;Couple's Choice;Showdance"],
+["golf-clubs","Name a type of golf club","Driver;Putter;Iron;Sand wedge;Pitching wedge;Wedge;Wood;Fairway wood;3-wood|Three wood;Hybrid;Lob wedge;7-iron|Seven iron;Gap wedge;Rescue;5-wood;Chipper;1-iron|One iron;Utility iron"],
+["golf-scores","Name a golf scoring term","Birdie;Par;Eagle;Bogey;Hole in one|Ace;Albatross|Double eagle;Double bogey;Triple bogey;Condor;Quadruple bogey;Snowman"],
+["open-venues","Name a course that has hosted the Open Championship","St Andrews;Carnoustie;Royal Birkdale|Birkdale;Muirfield;Royal Troon|Troon;Turnberry;Royal St George's|Sandwich;Royal Lytham & St Annes|Royal Lytham|Lytham;Royal Liverpool|Hoylake;Royal Portrush|Portrush;Prestwick;Musselburgh;Royal Cinque Ports|Deal;Prince's|Princes"],
+["golf-majors","Name a golf major (men's or women's)","The Masters|Masters;The Open|Open Championship|British Open;US Open|U.S. Open;PGA Championship|USPGA;Women's British Open|Women's Open|AIG Women's Open;US Women's Open;Women's PGA Championship|KPMG Women's PGA;Evian Championship|Evian;Chevron Championship|ANA Inspiration"],
+["open-winners","Name a winner of the Open Championship between 2000 and 2025","Tiger Woods|Woods;Rory McIlroy|McIlroy;Scottie Scheffler|Scheffler;Phil Mickelson|Mickelson;Ernie Els|Els;Padraig Harrington|Harrington;Jordan Spieth|Spieth;Shane Lowry|Lowry;Darren Clarke|Clarke;Henrik Stenson|Stenson;Cameron Smith;Collin Morikawa|Morikawa;Xander Schauffele|Schauffele;Francesco Molinari|Molinari;Zach Johnson;Louis Oosthuizen|Oosthuizen;Stewart Cink|Cink;Brian Harman|Harman;Todd Hamilton;Ben Curtis|Curtis;David Duval|Duval"],
+["wc-winners","Name a country that has won the men's football World Cup","Brazil;Germany|West Germany;Argentina;France;Italy;England;Spain;Uruguay"],
+["six-nations","Name a team in rugby union's Six Nations","England;Wales;Ireland;Scotland;France;Italy"],
+["test-cricket","Name a men's Test cricket nation","England;Australia;India;South Africa;New Zealand;Pakistan;West Indies;Sri Lanka;Bangladesh;Zimbabwe;Ireland;Afghanistan"],
+["f1-champs","Name a Formula 1 world champion from 1990 to 2024","Lewis Hamilton|Hamilton;Michael Schumacher|Schumacher;Max Verstappen|Verstappen;Sebastian Vettel|Vettel;Ayrton Senna|Senna;Fernando Alonso|Alonso;Jenson Button|Button;Nigel Mansell|Mansell;Damon Hill|Hill;Kimi Raikkonen|Raikkonen;Alain Prost|Prost;Nico Rosberg|Rosberg;Mika Hakkinen|Hakkinen;Jacques Villeneuve|Villeneuve"],
+["england-managers","Name a manager of the England men's football team (including caretakers)","Gareth Southgate|Southgate;Alf Ramsey|Sir Alf Ramsey|Ramsey;Sven-Goran Eriksson|Sven|Eriksson;Thomas Tuchel|Tuchel;Fabio Capello|Capello;Roy Hodgson|Hodgson;Steve McClaren|McClaren;Kevin Keegan|Keegan;Terry Venables|Venables;Glenn Hoddle|Hoddle;Bobby Robson|Robson;Graham Taylor|Taylor;Sam Allardyce|Allardyce|Big Sam;Don Revie|Revie;Lee Carsley|Carsley;Stuart Pearce|Pearce;Ron Greenwood|Greenwood;Howard Wilkinson|Wilkinson;Peter Taylor;Walter Winterbottom|Winterbottom;Joe Mercer|Mercer"],
+["snooker-champs","Name a snooker world champion from 2000 to 2025","Ronnie O'Sullivan|O'Sullivan|Ronnie;Mark Selby|Selby;John Higgins|Higgins;Judd Trump|Trump;Mark Williams;Neil Robertson|Robertson;Shaun Murphy|Murphy;Kyren Wilson;Stuart Bingham|Bingham;Luca Brecel|Brecel;Peter Ebdon|Ebdon;Graeme Dott|Dott;Zhao Xintong|Zhao"],
+["scottish-champs","Name a club that has won the Scottish top-flight league title","Celtic;Rangers;Aberdeen;Hearts|Heart of Midlothian;Hibernian|Hibs;Dundee United;Dundee;Kilmarnock;Motherwell;Dumbarton;Third Lanark"],
+["full-english","Name something you'd find on a full English breakfast","Bacon;Sausage|Sausages;Egg|Eggs|Fried egg|Scrambled eggs;Baked beans|Beans;Toast;Mushrooms;Black pudding;Tomato|Tomatoes;Hash browns|Hash brown;Fried bread;Bubble and squeak;White pudding;Potato scone|Tattie scone;Fried slice"],
+["coffee","Name a type of coffee drink","Latte;Cappuccino;Espresso;Americano;Flat white;Mocha;Macchiato;Cortado;Iced latte;Cold brew;Irish coffee;Frappe|Frappuccino;Affogato;Ristretto;Long black;Doppio;Lungo;Piccolo;Cafe au lait;Turkish coffee;Red eye"],
+["london-boroughs","Name a London borough (or the City of London)","Westminster|City of Westminster;Camden;Islington;Hackney;Croydon;Greenwich|Royal Greenwich;Kensington and Chelsea|Kensington|Chelsea;Southwark;Lambeth;Tower Hamlets;Wandsworth;Hammersmith and Fulham|Hammersmith;Richmond upon Thames|Richmond;Newham;Brent;Ealing;Lewisham;Haringey;Barnet;Enfield;City of London|The City;Bromley;Harrow;Hounslow;Kingston upon Thames|Kingston;Hillingdon;Merton;Sutton;Waltham Forest;Redbridge;Havering;Bexley;Barking and Dagenham|Barking"],
+["tube-lines","Name a London Underground line","Central;Northern;Jubilee;Victoria;Piccadilly;District;Circle;Bakerloo;Metropolitan;Hammersmith & City;Waterloo & City"],
+["english-counties","Name a ceremonial county of England","Yorkshire|North Yorkshire;Kent;Cornwall;Devon;Essex;Surrey;Sussex|East Sussex;Lancashire;Norfolk;Suffolk;Somerset;Cumbria;Hampshire;Greater London|London;Greater Manchester;Cheshire;Dorset;Oxfordshire;West Sussex;West Yorkshire;Merseyside;Nottinghamshire;Derbyshire;Lincolnshire;Northumberland;Gloucestershire;Wiltshire;Berkshire;Cambridgeshire;Hertfordshire;Leicestershire;South Yorkshire;West Midlands;Staffordshire;Durham|County Durham;Warwickshire;Northamptonshire;Bedfordshire;Buckinghamshire;Shropshire;Herefordshire;Worcestershire;Tyne and Wear;East Riding of Yorkshire;Bristol;Isle of Wight;Rutland"],
+["canada-provinces","Name a Canadian province or territory","Ontario;Quebec;British Columbia;Alberta;Nova Scotia;Manitoba;Saskatchewan;Newfoundland and Labrador|Newfoundland;Yukon;New Brunswick;Prince Edward Island|PEI;Northwest Territories;Nunavut"],
+["aus-states","Name an Australian state or territory","New South Wales|NSW;Queensland;Victoria;Western Australia;Tasmania;South Australia;Northern Territory;Australian Capital Territory|ACT"],
+["russell-group","Name a Russell Group university","Oxford|University of Oxford;Cambridge|University of Cambridge;Imperial College London|Imperial;University College London|UCL;London School of Economics|LSE;King's College London|King's College|KCL;Edinburgh;Manchester;Bristol;Durham;Warwick;Glasgow;Leeds;Birmingham;Nottingham;Exeter;Southampton;Sheffield;Liverpool;York;Newcastle;Cardiff;Queen Mary University of London|Queen Mary|QMUL;Queen's University Belfast|Queen's Belfast"],
+["unsc","Name a permanent member of the UN Security Council","United States|USA|US|America;Russia;China;United Kingdom|UK|Britain;France"],
+["platonic","Name a Platonic solid","Cube|Hexahedron;Tetrahedron;Octahedron;Dodecahedron;Icosahedron"],
+["polygons","Name a polygon (a flat shape with straight sides)","Triangle;Square;Rectangle;Pentagon;Hexagon;Octagon;Rhombus;Parallelogram;Trapezium|Trapezoid;Heptagon|Septagon;Decagon;Kite;Nonagon;Dodecagon;Hendecagon|Undecagon"],
+["lloyd-webber","Name a musical by Andrew Lloyd Webber","The Phantom of the Opera|Phantom of the Opera;Cats;Evita;Joseph and the Amazing Technicolor Dreamcoat|Joseph;Jesus Christ Superstar;Starlight Express;Sunset Boulevard;School of Rock;Aspects of Love;Whistle Down the Wind;The Woman in White;Love Never Dies;Cinderella;Bad Cinderella;Song and Dance;Tell Me on a Sunday;By Jeeves;The Beautiful Game;Stephen Ward"],
+["nobel","Name a Nobel Prize category","Peace;Physics;Chemistry;Literature;Physiology or Medicine|Medicine;Economics|Economic Sciences"],
+["vitamins","Name a vitamin (letter or chemical name)","Vitamin C|C;Vitamin D|D;Vitamin A|A;Vitamin B12|B12;Vitamin E|E;Vitamin K|K;Vitamin B6|B6;Folic acid|Folate|B9;Vitamin B1|Thiamine|B1;Riboflavin|B2;Niacin|B3;Biotin|B7;Pantothenic acid|B5;Ascorbic acid;Retinol;Cobalamin"],
+["orchestra","Name an instrument you'd find in a symphony orchestra","Violin;Cello;Trumpet;Flute;Clarinet;Double bass;Viola;Oboe;Trombone;French horn|Horn;Timpani;Bassoon;Tuba;Harp;Piccolo;Cymbals;Snare drum;Triangle;Xylophone;Glockenspiel;Cor anglais|English horn;Bass drum;Contrabassoon;Celesta;Bass clarinet;Tam-tam|Gong;Tubular bells"],
+["olympic-hosts","Name a country that has hosted the Summer Olympics","United Kingdom|UK|Britain;United States|USA|US|America;France;Greece;China;Australia;Japan;Brazil;Spain;Germany|West Germany;Russia|Soviet Union|USSR;Italy;Mexico;Canada;South Korea|Korea;Sweden;Netherlands;Belgium;Finland"],
+["wc-hosts","Name a country that has hosted the men's FIFA World Cup","Brazil;Germany|West Germany;France;Italy;England;Qatar;Russia;Spain;United States|USA|US;Mexico;Argentina;South Africa;Japan;South Korea;Canada;Uruguay;Sweden;Switzerland;Chile"],
+["germany-borders","Name a country that shares a land border with Germany","France;Poland;Austria;Netherlands|Holland;Switzerland;Belgium;Denmark;Czech Republic|Czechia;Luxembourg"],
+["france-borders","Name a country that shares a land border with France (overseas territories count)","Spain;Germany;Belgium;Italy;Switzerland;Luxembourg;Monaco;Andorra;Brazil;Suriname;Netherlands"],
+["china-borders","Name a country that shares a land border with China","India;Russia;Mongolia;North Korea;Pakistan;Vietnam;Nepal;Kazakhstan;Afghanistan;Myanmar|Burma;Laos;Bhutan;Kyrgyzstan;Tajikistan"],
+["eu-members","Name a current EU member state","France;Germany;Italy;Spain;Ireland;Netherlands|Holland;Belgium;Portugal;Greece;Sweden;Poland;Austria;Denmark;Finland;Hungary;Czech Republic|Czechia;Croatia;Romania;Bulgaria;Malta;Cyprus;Luxembourg;Slovakia;Slovenia;Estonia;Latvia;Lithuania"],
+["simpsons","Name a member of the Simpson family (Homer's relatives count)","Homer;Bart;Marge;Lisa;Maggie;Abe|Grampa|Grandpa|Abraham;Mona;Herb"],
+["friends","Name one of the six main characters in Friends","Joey|Joey Tribbiani;Rachel|Rachel Green;Ross|Ross Geller;Chandler|Chandler Bing;Monica|Monica Geller;Phoebe|Phoebe Buffay"],
+["london-airports","Name an airport that serves London","Heathrow;Gatwick;Stansted;Luton;London City|City Airport;Southend"],
+["national-parks","Name a national park in the UK","Lake District;Peak District;Snowdonia|Eryri;Dartmoor;Yorkshire Dales;New Forest;Exmoor;South Downs;Cairngorms;North York Moors;Brecon Beacons|Bannau Brycheiniog;Northumberland;Loch Lomond and the Trossachs|Loch Lomond;Pembrokeshire Coast|Pembrokeshire;The Broads|Norfolk Broads|Broads"],
+["scottish-cities","Name a city in Scotland","Edinburgh;Glasgow;Aberdeen;Dundee;Inverness;Stirling;Perth;Dunfermline"],
+["welsh-cities","Name a city in Wales","Cardiff;Swansea;Newport;Bangor;Wrexham;St Davids|St David's;St Asaph"],
+["swim-strokes","Name a competitive swimming stroke","Freestyle|Front crawl|Crawl;Breaststroke;Backstroke;Butterfly;Individual medley|Medley"],
+["dog-groups","Name one of the UK Kennel Club's seven breed groups","Gundog;Terrier;Hound;Toy;Working;Pastoral;Utility"],
+["teeth","Name a type of human tooth","Molar;Incisor;Canine;Wisdom tooth;Premolar"],
+["sherlock","Name a character from the Sherlock Holmes stories","Sherlock Holmes|Holmes|Sherlock;Dr Watson|John Watson|Watson;Moriarty|Professor Moriarty;Mrs Hudson|Hudson;Mycroft Holmes|Mycroft;Inspector Lestrade|Lestrade;Irene Adler|Adler;Mary Morstan;Colonel Moran|Sebastian Moran;Toby;Wiggins"]
+];
+
+/* Closest-to-the-pin questions: [question, answer, unit, kind]
+   kind: "y" year (bands widen for older dates), "c" whole-number count, "r" measurement (relative error), or an explicit band array
+   (max error allowed for 1..6 shots; anything beyond = out of bounds). */
+const PINS = [
+// ---- years: modern
+["In what year did the Berlin Wall fall?",1989,"","y"],
+["In what year did the Titanic sink?",1912,"","y"],
+["In what year did humans first land on the Moon?",1969,"","y"],
+["In what year did the First World War begin?",1914,"","y"],
+["In what year did the Second World War begin?",1939,"","y"],
+["In what year did the Second World War end?",1945,"","y"],
+["In what year was the first Premier League season kicked off?",1992,"","y"],
+["In what year did Elizabeth II become Queen?",1952,"","y"],
+["In what year did Queen Elizabeth II die?",2022,"","y"],
+["In what year did England win the men's football World Cup?",1966,"","y"],
+["In what year was the UK's Brexit referendum?",2016,"","y"],
+["In what year did the 9/11 attacks take place?",2001,"","y"],
+["In what year did the Soviet Union dissolve?",1991,"","y"],
+["In what year was Nelson Mandela released from prison?",1990,"","y"],
+["In what year did Nelson Mandela become President of South Africa?",1994,"","y"],
+["In what year was the first iPhone released?",2007,"","y"],
+["In what year was Facebook founded?",2004,"","y"],
+["In what year was Google founded?",1998,"","y"],
+["In what year was YouTube founded?",2005,"","y"],
+["In what year did the Channel Tunnel open?",1994,"","y"],
+["In what year did London host the Olympics for the third time?",2012,"","y"],
+["In what year did the Beatles release their first single, 'Love Me Do'?",1962,"","y"],
+["In what year did Diana, Princess of Wales, die?",1997,"","y"],
+["In what year did Margaret Thatcher become Prime Minister?",1979,"","y"],
+["In what year did Tony Blair become Prime Minister?",1997,"","y"],
+["In what year did the Chernobyl disaster happen?",1986,"","y"],
+["In what year was the first Harry Potter book published?",1997,"","y"],
+["In what year was the first Star Wars film released?",1977,"","y"],
+["In what year was the Wall Street Crash?",1929,"","y"],
+["In what year did some women first get the vote in UK general elections?",1918,"","y"],
+["In what year was the NHS founded?",1948,"","y"],
+["In what year did the UK switch to decimal currency?",1971,"","y"],
+["In what year did euro notes and coins enter circulation?",2002,"","y"],
+["In what year did Yuri Gagarin become the first person in space?",1961,"","y"],
+["In what year was President John F. Kennedy assassinated?",1963,"","y"],
+["In what year did the Wright brothers make the first powered flight?",1903,"","y"],
+["In what year did Concorde make its final commercial flight?",2003,"","y"],
+["In what year did the new Wembley Stadium open?",2007,"","y"],
+["In what year did Leicester City win the Premier League?",2016,"","y"],
+["In what year was the Live Aid concert?",1985,"","y"],
+["In what year was the first Glastonbury Festival held?",1970,"","y"],
+["In what year was Mount Everest first climbed?",1953,"","y"],
+["In what year did Roger Bannister run the first sub-four-minute mile?",1954,"","y"],
+["In what year was Tutankhamun's tomb discovered?",1922,"","y"],
+["In what year was the BBC founded?",1922,"","y"],
+["In what year was the first episode of Doctor Who broadcast?",1963,"","y"],
+["In what year was Coronation Street first broadcast?",1960,"","y"],
+["In what year was EastEnders first broadcast?",1985,"","y"],
+["In what year was the first FIFA World Cup played?",1930,"","y"],
+["In what year was the first Wimbledon Championship played?",1877,"","y"],
+["In what year was the first FA Cup final played?",1872,"","y"],
+["In what year was the Football League founded?",1888,"","y"],
+["In what year were the first modern Olympic Games held?",1896,"","y"],
+["In what year was the first Open Championship (golf) played?",1860,"","y"],
+["In what year was the first Tour de France?",1903,"","y"],
+["In what year did Alexander Fleming discover penicillin?",1928,"","y"],
+["In what year did Queen Victoria come to the throne?",1837,"","y"],
+["In what year did Queen Victoria die?",1901,"","y"],
+["In what year did Britain pass the Act abolishing the slave trade?",1807,"","y"],
+["In what year was Darwin's 'On the Origin of Species' published?",1859,"","y"],
+["In what year was Charles Darwin born?",1809,"","y"],
+["In what year was the Battle of Waterloo?",1815,"","y"],
+["In what year was the Battle of Trafalgar?",1805,"","y"],
+["In what year was the Great Exhibition held in London's Hyde Park?",1851,"","y"],
+["In what year was the Eiffel Tower completed?",1889,"","y"],
+["In what year was the Statue of Liberty dedicated?",1886,"","y"],
+["In what year did the Suez Canal open?",1869,"","y"],
+["In what year was the Penny Black stamp issued?",1840,"","y"],
+["In what year did Tower Bridge open?",1894,"","y"],
+["In what year did the London Underground first open?",1863,"","y"],
+["In what year was the first commercial Christmas card sent?",1843,"","y"],
+["In what year did the UK officially leave the European Union?",2020,"","y"],
+["In what year was the first ever FA Women's Super League season?",2011,"","y"],
+["In what year did Tiger Woods win his first Masters?",1997,"","y"],
+["In what year did a European team first win the Ryder Cup?",1985,"","y"],
+// ---- years: older
+["In what year was the Battle of Hastings?",1066,"","y"],
+["In what year was Magna Carta sealed?",1215,"","y"],
+["In what year did Columbus first reach the Americas?",1492,"","y"],
+["In what year was William Shakespeare born?",1564,"","y"],
+["In what year did William Shakespeare die?",1616,"","y"],
+["In what year was the US Declaration of Independence signed?",1776,"","y"],
+["In what year was the storming of the Bastille?",1789,"","y"],
+["In what year was the Gunpowder Plot?",1605,"","y"],
+["In what year did the Spanish Armada sail against England?",1588,"","y"],
+["In what year did Henry VIII become king?",1509,"","y"],
+["In what year was the Great Fire of London?",1666,"","y"],
+["In what year did the Black Death reach England?",1348,"","y"],
+["In what year did Constantinople fall to the Ottomans?",1453,"","y"],
+["In what year did Isaac Newton publish his Principia?",1687,"","y"],
+["In what year was the Act of Union joining England and Scotland?",1707,"","y"],
+["In what year did Captain Cook first land in Australia (Botany Bay)?",1770,"","y"],
+["In what year was the Battle of Bosworth Field?",1485,"","y"],
+["In what year was Queen Elizabeth I crowned?",1559,"","y"],
+["In what year was Mount Vesuvius's eruption that buried Pompeii (AD)?",79,"","y"],
+["In what year (AD) did the Roman conquest of Britain begin under Claudius?",43,"","y"],
+["In what year (AD) did construction of Hadrian's Wall begin?",122,"","y"],
+// ---- counts
+["How many bones are in the adult human body?",206,"bones","c"],
+["How many member states are in the European Union?",27,"",[0,1,2,4,7,12]],
+["How many keys are on a standard piano?",88,"keys","c"],
+["What is the maximum break in standard snooker?",147,"","c"],
+["How many squares are on a chessboard?",64,"squares","c"],
+["How many players are on a rugby union team on the pitch?",15,"players",[0,1,2,4,6,10]],
+["How many players are on a rugby league team on the pitch?",13,"players",[0,1,2,4,6,10]],
+["How many players are on a netball team on court?",7,"players",[0,1,2,3,5,8]],
+["What is the maximum number of clubs allowed in a golf bag?",14,"clubs",[0,1,2,4,6,10]],
+["How many member states are in the United Nations?",193,"","c"],
+["How many elements are on the periodic table?",118,"","c"],
+["How many teeth does an adult human normally have?",32,"teeth","c"],
+["How many hearts does an octopus have?",3,"hearts",[0,1,2,3,5,8]],
+["How high is a basketball hoop, in feet?",10,"feet",[0,1,2,3,5,8]],
+["How long is a cricket pitch, in yards?",22,"yards","c"],
+["How far is the penalty spot from the goal line, in yards?",12,"yards",[0,1,2,4,6,10]],
+["How wide is a football goal, in feet?",24,"feet","c"],
+["How high is a football crossbar, in feet?",8,"feet",[0,1,2,3,5,8]],
+["What is the highest possible checkout in darts?",170,"","c"],
+["How many spaces are there around a Monopoly board?",40,"spaces","c"],
+["How many strings does a concert (pedal) harp have?",47,"strings","c"],
+["How many bones are in each human hand?",27,"bones","c"],
+["How many bones are in each human foot?",26,"bones","c"],
+["How many minutes are in a day?",1440,"minutes","c"],
+["How many seconds are in an hour?",3600,"seconds","c"],
+["How many hours are in a week?",168,"hours","c"],
+["How many feet are in a mile?",5280,"feet","c"],
+["How many yards are in a mile?",1760,"yards","c"],
+["How many pints are in a UK gallon?",8,"pints",[0,1,2,3,5,8]],
+["How many ounces are in a pound?",16,"ounces",[0,1,2,4,6,10]],
+["How many pounds are in a stone?",14,"pounds",[0,1,2,4,6,10]],
+["How many moons does Mars have?",2,"moons",[0,1,2,3,5,8]],
+["How many London boroughs are there (excluding the City)?",32,"boroughs","c"],
+["How many countries are there in Africa?",54,"countries","c"],
+["Donald Trump's second term made him which number President of the USA?",47,"th","c"],
+["How many sonnets did Shakespeare write?",154,"sonnets","c"],
+["How many official (Eon) James Bond films have been released?",25,"films","c"],
+["How many clubs play in the Premier League each season?",20,"clubs",[0,1,2,4,6,10]],
+["What was Manchester City's record Premier League points total in 2017-18?",100,"points","c"],
+["How many Premier League goals did Alan Shearer score?",260,"goals","c"],
+["How many Premier League goals did Erling Haaland score in his record-breaking 2022-23 season?",36,"goals","c"],
+["How many men's major championships has Tiger Woods won?",15,"majors",[0,1,2,4,6,10]],
+["How many men's major championships did Jack Nicklaus win?",18,"majors",[0,1,2,4,6,10]],
+["How many Grand Slam singles titles did Roger Federer win?",20,"titles",[0,1,2,4,6,10]],
+["How long is an Olympic swimming pool, in metres?",50,"m","c"],
+["How many yards are in a furlong?",220,"yards","c"],
+["How many hurdles are in a 110m hurdles race?",10,"hurdles",[0,1,2,3,5,8]],
+["How many chromosomes are in a normal human body cell?",46,"","c"],
+["How many stripes are on the US flag?",13,"stripes",[0,1,2,4,6,10]],
+["How many players are on a polo team?",4,"players",[0,1,2,3,5,8]],
+["How many balls are on a snooker table at the start of a frame (including the cue ball)?",22,"balls","c"],
+["How many points is a touchdown worth in American football?",6,"points",[0,1,2,3,5,8]],
+["What do the dots on a standard six-sided die add up to?",21,"","c"],
+["How many tiles are in a standard English Scrabble set?",100,"tiles","c"],
+["How many squares are on a Scrabble board?",225,"squares","c"],
+["How many points is the letter Q worth in English Scrabble?",10,"points",[0,1,2,3,5,8]],
+["How many cards are in a tarot deck?",78,"cards","c"],
+["How many pieces does each player start a game of chess with?",16,"pieces",[0,1,2,4,6,10]],
+["How many lines are there in a sonnet?",14,"lines",[0,1,2,4,6,10]],
+["How many symphonies did Beethoven complete?",9,"",[0,1,2,3,5,8]],
+["How many Commonwealth member countries are there?",56,"countries","c"],
+["How many US states border Canada?",13,"states",[0,1,2,4,6,10]],
+["How many time zones does mainland Russia span?",11,"time zones",[0,1,2,4,6,10]],
+["How many World Cups have Brazil won?",5,"",[0,1,2,3,5,8]],
+["How many times did Red Rum win the Grand National?",3,"",[0,1,2,3,5,8]],
+["How many legs does a lobster have (not counting claws)?",8,"legs",[0,1,2,3,5,8]],
+["How many years are celebrated by a diamond wedding anniversary?",60,"years","c"],
+["How many years are celebrated by a golden wedding anniversary?",50,"years","c"],
+["How many dimples are on a standard golf ball, roughly? (Any answer 300–500 is close)",400,"",[100,150,200,300,450,700]],
+["How many events are in a decathlon?",10,"events",[0,1,2,3,5,8]],
+["How many holes are on a standard full-size golf course?",18,"holes",[0,1,2,4,6,10]],
+["How many squares are on a Snakes and Ladders board, usually?",100,"squares","c"],
+// ---- measurements (relative error)
+["How tall is Mount Everest, in metres?",8849,"m","r"],
+["How long is a marathon, in miles?",26.2,"miles",[0.05,0.5,1.5,3,6,12]],
+["Roughly how far is the Moon from Earth on average, in km?",384400,"km","r"],
+["At what temperature does water boil at sea level, in °F?",212,"°F","c"],
+["How tall is the Eiffel Tower today, in metres?",330,"m","r"],
+["Roughly how fast does light travel in a vacuum, in km per second?",299792,"km/s","r"],
+["What is absolute zero in °C?",-273.15,"°C",[0.5,3,10,30,80,200]],
+["What is normal human body temperature in °C?",37,"°C",[0.2,0.5,1,2,4,8]],
+["Roughly how fast does sound travel through air, in metres per second?",343,"m/s","r"],
+["Roughly how many km is it around the Earth at the equator?",40075,"km","r"],
+["Roughly how far is the Earth from the Sun, in millions of km?",149.6,"million km","r"],
+["How tall is the Elizabeth Tower (Big Ben), in metres?",96,"m","r"],
+["How tall is the Shard in London, in metres?",310,"m","r"],
+["How tall is the Burj Khalifa, in metres?",828,"m","r"],
+["How long is the Channel Tunnel, in km?",50,"km","r"],
+["How long is the River Thames, in km?",346,"km","r"],
+["How tall is Ben Nevis, in metres?",1345,"m","r"],
+["How tall is Snowdon (Yr Wyddfa), in metres?",1085,"m","r"],
+["How deep is the deepest point of the ocean (Challenger Deep), in metres, roughly?",10935,"m","r"],
+["Roughly how many people live on Earth, in billions?",8.2,"billion",[0.1,0.4,1,2,3.5,6]],
+["Roughly how many people live in the UK, in millions?",69,"million","r"],
+["How many metres are in a mile, roughly?",1609,"m","r"],
+["How many grams are in an ounce, roughly?",28.35,"g","r"],
+["What is Usain Bolt's 100m world record, in seconds?",9.58,"s",[0,0.05,0.15,0.4,1,2]],
+["How high is an Olympic diving platform, in metres?",10,"m",[0,1,2,3,5,8]],
+["How many calories are in one gram of fat, roughly?",9,"kcal",[0,1,2,3,5,8]],
+["What is the pH of pure water?",7,"",[0,0.5,1,2,3,5]],
+["What is the atomic number of gold?",79,"","c"],
+["What is the atomic number of iron?",26,"","c"],
+["How long is a standard tennis court, in feet?",78,"feet","c"],
+["How long is a cricket bat allowed to be, at most, in inches?",38,"inches","c"],
+["How many litres of blood does an adult human body hold, roughly?",5,"litres",[0.3,0.8,1.5,2.5,4,7]],
+["How long is a standard 10-pin bowling lane, in feet (foul line to head pin)?",60,"feet","r"],
+["What is the diameter of a golf hole (cup), in inches?",4.25,"inches",[0,0.25,0.75,1.5,3,6]],
+["How long is the Great Wall of China's main wall, in km, roughly? (Ming wall)",8850,"km",[200,600,1500,3000,6000,12000]],
+["How tall is the Statue of Liberty itself (heel to torch, not the pedestal), in metres?",46,"m","r"],
+["How far is it from London to Edinburgh as the crow flies, in miles?",332,"miles","r"],
+["What is the speed limit on a UK motorway, in mph?",70,"mph","c"],
+["How many degrees are in the interior angles of a hexagon, added together?",720,"degrees","c"],
+["What is the boiling point of water in kelvin, roughly?",373,"K","c"]
+].filter(q=>q[3]!=="skip");
+
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+const TEST_MODE = false;         // true = unlimited replays of the daily course + free test coins
+const LAUNCH = "2026-11-06";     // Course #1
+const PAR = 4, HOLES = 9, SECONDS = 25, RETRY_SECONDS = 15;
+const LAYOUT = ["R","P","R","R","P","R","R","P","R"];  // 6 rare-find, 3 closest-to-the-pin
+const TERMS = {1:"Hole in one!",2:"Eagle",3:"Birdie",4:"Par",5:"Bogey",6:"Double bogey",7:"Triple bogey",8:"Quadruple bogey"};
+const SHOP = { mull:{cost:100,max:3}, rain:{cost:150,max:2} };
+const EARN = { hole:{1:50,2:20,3:10,4:5}, finish:10, underPar:20, streakPer:5, streakCap:50 };
+
+/* =========================================================
+   CONTENT: build the prompt pools
+   ========================================================= */
+function first(s){ return s.split("|")[0]; }
+function buildRare(){
+  const out=[];
+  const add=(id,p,list,fam)=>{ if(list.length>=4) out.push({id,p,a:list,fam:fam||id}); };
+  const C=COUNTRIES.map(([n,c,cap])=>({n,c:c.split(" "),cap}));
+  const contName={EU:"Name a country in Europe (England, Scotland etc. count)",AS:"Name a country in Asia",AF:"Name a country in Africa",NA:"Name a country in North America, Central America or the Caribbean",SA:"Name a country in South America",OC:"Name a country in Oceania"};
+  for(const k in contName) add("c-"+k, contName[k], C.filter(x=>x.c.includes(k)).map(x=>x.n), "country");
+  const capName={EU:"Name the capital city of a European country",AS:"Name the capital city of an Asian country",AF:"Name the capital city of an African country",AM:"Name the capital city of a country in the Americas",OC:"Name the capital city of a country in Oceania"};
+  for(const k in capName){
+    const seen=new Set(), list=[];
+    for(const x of C){ const inK = k==="AM" ? (x.c.includes("NA")||x.c.includes("SA")) : x.c.includes(k); if(!inK) continue;
+      const f=norm(first(x.cap)); if(seen.has(f)) continue; seen.add(f); list.push(x.cap); }
+    add("cap-"+k, capName[k], list, "capital");
+  }
+  for(const L of "ABCGILMNPST"){ const list=C.filter(x=>norm(first(x.n))[0]===L.toLowerCase()).map(x=>x.n); if(list.length>=7) add("cl-"+L,`Name a country beginning with ${L}`,list,"country-letter"); }
+  add("c-ia","Name a country whose name ends in -ia",C.filter(x=>/ia$/.test(norm(first(x.n)))).map(x=>x.n),"country-letter");
+  add("c-land","Name a country whose name ends in -land",C.filter(x=>/land$/.test(norm(first(x.n)))).map(x=>x.n),"country");
+  for(const L of "BMSP"){ const seen=new Set(), list=[];
+    for(const x of C){ const f=norm(first(x.cap)); if(f[0]!==L.toLowerCase()||seen.has(f)) continue; seen.add(f); list.push(x.cap); }
+    add("capl-"+L,`Name a capital city beginning with ${L}`,list,"capital"); }
+  add("el-any","Name a chemical element",ELEMENTS.map(e=>e[0]),"element");
+  add("el-ium","Name a chemical element ending in -ium",ELEMENTS.filter(e=>/ium$/.test(norm(first(e[0])))).map(e=>e[0]),"element");
+  add("el-1","Name an element whose chemical symbol is a single letter",ELEMENTS.filter(e=>e[1].length===1).map(e=>e[0]),"element");
+  for(const L of "CBNS") add("el-"+L,`Name a chemical element beginning with ${L}`,ELEMENTS.filter(e=>norm(first(e[0]))[0]===L.toLowerCase()).map(e=>e[0]),"element");
+  add("us-any","Name a US state",STATES.map(s=>s[0]),"usa");
+  add("us-cap","Name a US state capital",STATE_CAPITAL_FAME.map(c=>{const s=STATES.find(x=>norm(first(x[1]))===norm(c)); return s?s[1]:c;}),"usa");
+  add("us-M","Name a US state beginning with M",STATES.filter(s=>s[0][0]==="M").map(s=>s[0]),"usa");
+  add("us-N","Name a US state beginning with N",STATES.filter(s=>s[0][0]==="N").map(s=>s[0]),"usa");
+  add("us-2","Name a US state with a two-word name",STATES.filter(s=>s[0].includes(" ")).map(s=>s[0]),"usa");
+  const famOf={g7:"country",unsc:"country",eu_members:"country","eu-members":"country","germany-borders":"country","france-borders":"country","china-borders":"country","olympic-hosts":"country","wc-hosts":"country",
+    "noble-gases":"element","odd-symbols":"element","planets":"space","constellations":"space","beatles":"band","spice-girls":"band","one-direction":"band","take-that":"band","queen-band":"band",
+    "golf-clubs":"golf","golf-scores":"golf","open-venues":"golf","golf-majors":"golf","open-winners":"golf","greek-gods":"myth","roman-gods":"myth","norse-gods":"myth",
+    "tudors":"royals","monarchs-1714":"royals","henry-wives":"royals","scottish-cities":"ukplaces","welsh-cities":"ukplaces","zodiac":"zodiac","chinese-zodiac":"zodiac"};
+  for(const h of HAND){ const [id,p,a,theme]=h; const r={id,p,a:a.split(";"),fam:famOf[id]||id}; if(theme) r.theme=theme; out.push(r); }
+  return out;
+}
+function buildPins(){
+  return PINS.map(([p,ans,unit,kind],i)=>{
+    let mode="abs", bands, fmt="";
+    if(Array.isArray(kind)) bands=kind;
+    else if(kind==="y"){ fmt="year"; bands = ans>=1800?[0,1,3,8,20,50] : ans>=1000?[0,3,10,30,75,150] : [0,5,20,50,100,200]; }
+    else if(kind==="c"){ const c=x=>Math.max(1,Math.ceil(ans*x)); bands=[0,c(.04),c(.1),c(.25),c(.5),c(1)]; }
+    else { mode="rel"; bands=[0.01,0.05,0.12,0.25,0.5,1]; }
+    return {id:"pin"+i,p,ans,unit,mode,bands,fmt};
+  });
+}
+
+/* =========================================================
+   LOGIC (pure)
+   ========================================================= */
+function norm(s){
+  return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+    .replace(/&/g," and ").replace(/\bpt\b\.?/g,"part")
+    .replace(/[’'`.,!?:;()"*\-]/g," ").replace(/^\s*the\s+/,"").replace(/\s+/g," ").trim();
+}
+function lev(a,b){
+  if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,i)=>i), cur=new Array(n+1);
+  for(let i=1;i<=m;i++){ cur[0]=i; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); [prev,cur]=[cur,prev]; }
+  return prev[n];
+}
+// "St" can mean Saint or Street: try every reading
+function stForms(k){ return [k, k.replace(/\bst\b/g,"saint"), k.replace(/\bst\b/g,"street"), k.replace(/\bsaint\b/g,"st")]; }
+function rareShots(i,n){ if(i===n-1) return 1; const p=i/n; return p<0.12?5:p<0.32?4:p<0.6?3:p<0.85?2:1; }
+function matchRare(input, list){
+  const q=norm(input); if(!q) return null;
+  const entries=list.map((s,i)=>({i,name:first(s),keys:[...new Set(s.split("|").map(norm).flatMap(stForms))]}));
+  for(const v of stForms(q)) for(const e of entries) if(e.keys.includes(v)) return {...e, exact:true};
+  let best=null,bd=99;
+  for(const e of entries) for(const k of e.keys){
+    const allow = k.length>=10?3 : k.length>=6?2 : k.length>=4?1 : 0; if(!allow) continue;
+    const d=lev(q,k); if(d<=allow && d<bd){bd=d;best=e;}
+  }
+  return best ? {...best, exact:false} : null;
+}
+function parseNum(s){
+  const t=String(s).toLowerCase().replace(/,/g,"").replace(/\s+/g,"");
+  const m=t.match(/^(-?\d*\.?\d+)(k|thousand|mil|million|bn|billion)?/); if(!m) return NaN;
+  const mult={k:1e3,thousand:1e3,mil:1e6,million:1e6,bn:1e9,billion:1e9}[m[2]]||1;
+  return parseFloat(m[1])*mult;
+}
+function pinShots(guess,q){
+  if(!Number.isFinite(guess)) return 7;
+  const err = q.mode==="rel" ? Math.abs(guess-q.ans)/Math.abs(q.ans) : Math.abs(guess-q.ans);
+  for(let i=0;i<q.bands.length;i++) if(err<=q.bands[i]+1e-9) return i+1;
+  return 7;
+}
+function hashStr(s){ let h=2166136261; for(const c of s){ h^=c.charCodeAt(0); h=Math.imul(h,16777619);} return h>>>0; }
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffled(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function toParStr(n){ return n===0?"E":(n>0?"+"+n:String(n)); }
+function localKey(d){ const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function dayIndex(key){ return Math.round((Date.parse(key+"T12:00:00Z")-Date.parse(LAUNCH+"T12:00:00Z"))/864e5); }
+function addDays(key,n){ const d=new Date(key+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); }
+function fmtNum(v,q){ if(q && q.fmt==="year") return String(v); return Number(v).toLocaleString("en-GB",{maximumFractionDigits:2}); }
+
+const RARE_ALL = buildRare(), PIN_ALL = buildPins();
+const RARE_POOL = RARE_ALL.filter(r=>!r.theme), PIN_POOL = PIN_ALL;
+
+// Fixed season order. Rare prompts are ordered so no two from the same family land within 6 slots of each other.
+function seasonOrder(){
+  const r=rng(hashStr("pinhigh-season-1"));
+  let pool=shuffled(RARE_POOL,r), order=[];
+  while(pool.length){
+    const recent=new Set(order.slice(-6).map(x=>x.fam));
+    let k=pool.findIndex(x=>!recent.has(x.fam)); if(k<0) k=0;
+    order.push(pool.splice(k,1)[0]);
+  }
+  return {rare:order, pins:shuffled(PIN_POOL,r)};
+}
+const SEASON = seasonOrder();
+function courseFor(key){
+  const n=Math.max(0,dayIndex(key)), R=SEASON.rare.length, P=SEASON.pins.length, r=rng(hashStr("layout"+key));
+  let ri=n*6, pi=n*3;
+  const holes=LAYOUT.map(t=> t==="R" ? {type:"R", ref:SEASON.rare[(ri++)%R]} : {type:"P", ref:SEASON.pins[(pi++)%P]});
+  const themed=RARE_ALL.filter(x=>x.theme && x.theme===key.slice(5));
+  themed.forEach((t,i)=>{ const slot=holes.findIndex((h,j)=>h.type==="R" && j>=i*3); if(slot>=0) holes[slot]={type:"R",ref:t}; });
+  holes.forEach(h=>h.layout={a:r(),b:r(),c:r(),d:r()});
+  return holes;
+}
+function practiceCourse(){
+  const r=Math.random; const rs=shuffled(RARE_POOL,r), ps=shuffled(PIN_POOL,r); let i=0,j=0;
+  return LAYOUT.map(t=>({type:t, ref: t==="R"?rs[i++]:ps[j++], layout:{a:r(),b:r(),c:r(),d:r()}}));
+}
+// streak: returns {streak, rainUsed}
+function nextStreak(prof, key){
+  if(prof.lastDay===key) return {streak:prof.streak, rainUsed:0};
+  if(!prof.lastDay) return {streak:1, rainUsed:0};
+  const gap=dayIndex(key)-dayIndex(prof.lastDay)-1;   // days missed
+  if(gap<=0) return {streak:prof.streak+1, rainUsed:0};
+  if(gap<=prof.rain) return {streak:prof.streak+1, rainUsed:gap};
+  return {streak:1, rainUsed:0};
+}
+function coinsFor(res, streak){
+  const lines=[]; let holeCoins=0;
+  res.forEach(r=>{ holeCoins+=EARN.hole[r.shots]||0; });
+  if(holeCoins) lines.push(["Birdies, eagles & pars",holeCoins]);
+  lines.push(["Round completed",EARN.finish]);
+  const tp=res.reduce((s,r)=>s+r.shots-PAR,0);
+  if(tp<0) lines.push(["Under par",EARN.underPar]);
+  const sb=Math.min(EARN.streakCap,EARN.streakPer*streak); if(streak>1) lines.push([`${streak}-day streak`,sb]);
+  return {lines,total:lines.reduce((s,l)=>s+l[1],0)};
+}
+
+if (typeof module!=="undefined") module.exports={RARE_ALL,PIN_ALL,SEASON,courseFor,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
+
+/* =========================================================
+   UI
+   ========================================================= */
+if (typeof document!=="undefined") (function(){
+  const $=id=>document.getElementById(id);
+  const store={ get(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} },
+                set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} } };
+  const PROFILE_KEY="pinhigh-profile-v1";
+  const blank={coins:0, mull:1, rain:0, streak:0, bestStreak:0, lastDay:null, played:0, totalToPar:0, best:null, paid:{}};
+  let P=Object.assign({},blank,store.get(PROFILE_KEY)||{});
+  const saveP=()=>store.set(PROFILE_KEY,P);
+  const todayKey=localKey(new Date()), courseNo=dayIndex(todayKey)+1;
+  let S=null, timer=null, tStart=0;
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- clubhouse ---------- */
+  function liveStreak(){ // streak shown today: broken if a gap can't be covered
+    if(!P.lastDay) return 0;
+    const gap=dayIndex(todayKey)-dayIndex(P.lastDay)-1;
+    return gap<=0 || gap<=P.rain ? P.streak : 0;
+  }
+  function renderWallet(){
+    $("wStreak").textContent=(liveStreak()?"🔥":"")+liveStreak(); $("wCoins").textContent=P.coins;
+    $("wMull").textContent=P.mull; $("wRain").textContent=P.rain;
+  }
+  function renderHome(){
+    renderWallet();
+    $("coursePill").textContent = TEST_MODE ? "Test mode" : "Course #"+courseNo;
+    $("homeDate").textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Course #${courseNo}`;
+    const saved=store.get("pinhigh-"+todayKey), done=!TEST_MODE && saved && saved.done;
+    $("startDaily").textContent = done ? "See today's scorecard" : (!TEST_MODE && saved && saved.res && saved.res.length ? "Resume today's round" : "Tee off");
+    $("homeCountdown").classList.toggle("hidden",!done); if(done) $("homeCountdown").textContent=countdown();
+    $("rulesBox").open = !P.played;
+    $("costMull").textContent=SHOP.mull.cost; $("maxMull").textContent=SHOP.mull.max;
+    $("costRain").textContent=SHOP.rain.cost; $("maxRain").textContent=SHOP.rain.max;
+    $("buyMull").disabled = P.coins<SHOP.mull.cost || P.mull>=SHOP.mull.max;
+    $("buyRain").disabled = P.coins<SHOP.rain.cost || P.rain>=SHOP.rain.max;
+    $("buyMull").textContent = P.mull>=SHOP.mull.max ? "Full" : "Buy";
+    $("buyRain").textContent = P.rain>=SHOP.rain.max ? "Full" : "Buy";
+    $("sPlayed").textContent=P.played; $("sBest").textContent=P.best==null?"–":toParStr(P.best);
+    $("sAvg").textContent=P.played?toParStr(Math.round(P.totalToPar/P.played*10)/10):"–"; $("sBestStreak").textContent=P.bestStreak;
+    $("testCoins").classList.toggle("hidden",!TEST_MODE);
+  }
+  function buy(kind){
+    const it=SHOP[kind]; if(P.coins<it.cost || P[kind]>=it.max) return;
+    P.coins-=it.cost; P[kind]++; saveP(); renderHome(); toast(kind==="mull"?"Mulligan added 🔄":"Rain delay added 🌧️");
+  }
+  function countdown(){
+    const now=new Date(), mid=new Date(now); mid.setHours(24,0,0,0);
+    const m=Math.round((mid-now)/60000); return `Next course in ${Math.floor(m/60)}h ${m%60}m`;
+  }
+  function show(id){ ["home","hole","final"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); window.scrollTo({top:0}); }
+  function goHome(){ stopTimer(); renderHome(); show("home"); }
+
+  /* ---------- round ---------- */
+  function start(practice){
+    const saved = TEST_MODE ? null : store.get("pinhigh-"+todayKey);
+    if(!practice && saved && saved.done){ S=hydrate(saved); return finish(); }
+    if(!practice && saved && saved.res){ S=hydrate(saved); return playHole(); }
+    S={practice, key:todayKey, course: practice?practiceCourse():courseFor(todayKey), idx:0, res:[], done:false, mullUsed:null};
+    playHole();
+  }
+  // saved rounds store prompt ids; rebuild references
+  function dehydrate(s){ return {...s, course:s.course.map(h=>({type:h.type, id:h.ref.id, layout:h.layout}))}; }
+  function hydrate(s){ return {...s, course:s.course.map(h=>({type:h.type, layout:h.layout, ref:(h.type==="R"?RARE_ALL:PIN_ALL).find(x=>x.id===h.id)}))}; }
+  function saveRound(){ if(!S.practice && !TEST_MODE) store.set("pinhigh-"+S.key, dehydrate(S)); }
+  const runningToPar=()=>S.res.reduce((s,r)=>s+r.shots-PAR,0);
+
+  /* ---------- drawing ---------- */
+  function geom(h){ const L=h.layout, W=340, H=190;
+    return {W,H,tee:{x:40,y:150+L.a*18}, pin:{x:280+L.b*25,y:36+L.c*30}, ctrl:{x:120+L.d*120,y:L.a>0.5?40+L.b*40:150+L.c*20}}; }
+  function bez(g,t){ const u=1-t; return {x:u*u*g.tee.x+2*u*t*g.ctrl.x+t*t*g.pin.x, y:u*u*g.tee.y+2*u*t*g.ctrl.y+t*t*g.pin.y}; }
+  function drawHole(h){
+    const g=geom(h), L=h.layout, bunk=bez(g,0.55+L.c*0.2), by=bunk.y+(L.d>0.5?30:-30);
+    $("courseBox").innerHTML=`
+    <svg viewBox="0 0 ${g.W} ${g.H}" role="img" aria-label="Hole layout">
+      <defs><pattern id="stripe" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="24" height="24" fill="var(--fairway)"/><rect width="12" height="24" fill="var(--fairway2)"/></pattern>
+      <radialGradient id="gr" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#a4e07e"/><stop offset="1" stop-color="#78c057"/></radialGradient></defs>
+      <rect width="${g.W}" height="${g.H}" fill="#2a5e33"/>
+      ${[...Array(14)].map((_,i)=>`<circle cx="${(i*53+L.a*90)%g.W}" cy="${(i*37+L.b*70)%g.H}" r="${9+(i%3)*4}" fill="#1f4d2b" opacity=".8"/>`).join("")}
+      <path d="M${g.tee.x} ${g.tee.y} Q${g.ctrl.x} ${g.ctrl.y} ${g.pin.x} ${g.pin.y}" stroke="#4d8c3c" stroke-width="50" fill="none" stroke-linecap="round"/>
+      <path d="M${g.tee.x} ${g.tee.y} Q${g.ctrl.x} ${g.ctrl.y} ${g.pin.x} ${g.pin.y}" stroke="url(#stripe)" stroke-width="40" fill="none" stroke-linecap="round"/>
+      <ellipse cx="${bunk.x}" cy="${by}" rx="18" ry="10" fill="var(--sand)"/>
+      <ellipse cx="${g.pin.x}" cy="${g.pin.y}" rx="30" ry="24" fill="url(#gr)"/>
+      <rect x="${g.tee.x-10}" y="${g.tee.y-7}" width="20" height="14" rx="4" fill="#9ad37a"/>
+      <ellipse cx="${g.pin.x}" cy="${g.pin.y+1}" rx="3.2" ry="2" fill="#16301c"/>
+      <line x1="${g.pin.x}" y1="${g.pin.y}" x2="${g.pin.x}" y2="${g.pin.y-30}" stroke="#fff" stroke-width="1.6"/>
+      <path d="M${g.pin.x} ${g.pin.y-30} l14 4.5 l-14 4.5z" fill="var(--flag)"/>
+      <g id="shots"></g>
+      <text id="svgOB" opacity="0" x="${g.W/2}" y="${g.H/2+8}" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-weight="800" font-size="26" fill="#fff" stroke="#c0392b" stroke-width="5" paint-order="stroke" style="transition:opacity .2s">OUT OF BOUNDS</text>
+      <ellipse id="shadow" cx="${g.tee.x}" cy="${g.tee.y+2}" rx="4" ry="1.6" fill="#000" opacity=".3"/>
+      <circle id="ball" cx="${g.tee.x}" cy="${g.tee.y}" r="3.6" fill="#fff" stroke="#ccc" stroke-width=".6"/>
+      <text x="12" y="22" font-family="Fraunces,Georgia,serif" font-weight="800" font-size="15" fill="#f7f2e4">${S.idx+1}</text>
+      <text id="shotCount" x="${g.W-12}" y="22" text-anchor="end" font-family="DM Sans,sans-serif" font-weight="700" font-size="12" fill="#f7f2e4" opacity="0"></text>
+    </svg>`;
+  }
+  function placeBall(p){ $("ball").setAttribute("cx",p.x); $("ball").setAttribute("cy",p.y); $("ball").setAttribute("r","3.6"); $("shadow").setAttribute("cx",p.x); $("shadow").setAttribute("cy",p.y+2); }
+  function label(t){ const l=$("shotCount"); l.setAttribute("opacity",".95"); l.textContent=t; }
+  function fly(from,to,cb,red){
+    const ball=$("ball"), sh=$("shadow"), trail=$("shots");
+    const dist=Math.hypot(to.x-from.x,to.y-from.y), dur=reduce?1:Math.max(450,Math.min(900,dist*4.2)), t0=performance.now();
+    trail.insertAdjacentHTML("beforeend",`<path d="M${from.x} ${from.y} Q${(from.x+to.x)/2} ${Math.min(from.y,to.y)-dist*0.35} ${to.x} ${to.y}" stroke="${red?"#ff8a7a":"#fff"}" stroke-opacity="0" stroke-width="1.2" fill="none" stroke-dasharray="2 3"/>`);
+    const tr=trail.lastElementChild;
+    (function step(now){
+      const t=Math.min(1,(now-t0)/dur), x=from.x+(to.x-from.x)*t, y=from.y+(to.y-from.y)*t, lift=Math.sin(Math.PI*t)*dist*0.28;
+      ball.setAttribute("cx",x); ball.setAttribute("cy",y-lift); ball.setAttribute("r",3.6+lift*0.06); sh.setAttribute("cx",x); sh.setAttribute("cy",y+2);
+      if(t<1) requestAnimationFrame(step); else { tr.setAttribute("stroke-opacity",".55"); cb(); }
+    })(t0);
+  }
+  function animateShots(h,hops,firstNum,cb){
+    const g=geom(h), r=rng(hashStr("anim"+S.idx+hops+firstNum)), pts=[];
+    for(let k=1;k<=hops;k++){ const p=bez(g,k/hops), off=k===hops?0:(r()-0.5)*26; pts.push({x:p.x+off*0.4,y:p.y+off}); }
+    let i=0, from={...g.tee}; placeBall(g.tee);
+    (function hop(){
+      if(i>=pts.length){ $("ball").setAttribute("r","2.2"); setTimeout(cb,reduce?0:350); return; }
+      label("Shot "+(firstNum+i)); fly(from,pts[i],()=>{ from=pts[i]; i++; setTimeout(hop,reduce?0:280); });
+    })();
+  }
+  function animateOB(h,shotNum,cb){
+    const g=geom(h), r=rng(hashStr("ob"+S.idx+shotNum)); placeBall(g.tee); label("Shot "+shotNum);
+    const mid=bez(g,0.45), side=r()<0.5?-1:1, to={x:mid.x+side*30, y:side<0?-30:g.H+30};
+    $("svgOB").setAttribute("opacity","0");
+    fly(g.tee,to,()=>{ $("svgOB").setAttribute("opacity","1");
+      setTimeout(()=>{ placeBall(g.tee); label(shotNum<3?"Penalty · playing 3":"Picked up"); cb(); }, reduce?0:900); },true);
+  }
+  function showBadge(shots){
+    const tp=shots-PAR;
+    $("badge").innerHTML=`<div class="c${shots}"><div class="num">${shots}</div><div class="nm">${TERMS[shots].replace("!","")}</div><div class="tp">${tp===0?"Level":toParStr(tp)}</div></div>`;
+    $("badge").classList.remove("hidden");
+  }
+
+  /* ---------- play ---------- */
+  function playHole(){
+    show("hole"); renderWallet();
+    const h=S.course[S.idx], d=h.ref;
+    $("holeTitle").textContent=`Hole ${S.idx+1}`;
+    $("holeMeta").textContent=`Par ${PAR} · ${S.idx+1} of ${HOLES}${S.practice?" · practice":""}`;
+    $("runTotal").textContent=toParStr(runningToPar());
+    drawHole(h);
+    $("askPane").classList.remove("hidden"); $("resultPane").classList.add("hidden");
+    $("badge").classList.add("hidden"); $("obNote").classList.add("hidden");
+    S.attempt=1; S.first=null; S.usingMull=false;
+    const isPin=h.type==="P";
+    $("chip").textContent=isPin?"📍 Closest to the pin":"🔎 Rare find"; $("chip").classList.toggle("pin",isPin);
+    $("prompt").textContent=d.p;
+    $("hint").textContent=isPin?"Closer guess = fewer shots":"Rarer answer = fewer shots";
+    $("unit").textContent=isPin?(d.unit||""):"";
+    const inp=$("answerInput"); inp.value=""; inp.disabled=false; hideSuggest();
+    inp.setAttribute("inputmode",isPin?"decimal":"text"); inp.placeholder=isPin?"Your guess":"Your answer";
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    startTimer(SECONDS);
+  }
+  function startTimer(secs){
+    stopTimer(); tStart=performance.now(); const bar=$("timerBar"), box=$("timer"); box.classList.remove("warn");
+    (function tick(now){ const left=Math.max(0,1-(now-tStart)/(secs*1000)); bar.style.transform=`scaleX(${left})`;
+      if(left<0.25) box.classList.add("warn"); if(left<=0){ submit(true); return; } timer=requestAnimationFrame(tick); })(tStart);
+  }
+  function stopTimer(){ if(timer) cancelAnimationFrame(timer); timer=null; }
+  function hideSuggest(){ $("suggest").classList.add("hidden"); }
+
+  function submit(timedOut, confirmed){
+    if(!S || $("askPane").classList.contains("hidden") || $("answerInput").disabled) return;
+    const h=S.course[S.idx], d=h.ref, raw=$("answerInput").value.trim();
+    if(h.type==="R" && !timedOut && !confirmed && raw){
+      const m=matchRare(raw,d.a);
+      if(m && !m.exact){ $("sugName").textContent=m.name; $("suggest").classList.remove("hidden"); $("sugYes").focus({preventScroll:true}); return; }
+    }
+    stopTimer(); hideSuggest(); $("answerInput").disabled=true; $("answerInput").blur();
+    let a;
+    if(h.type==="R"){ const m=matchRare(raw,d.a); a = m?{x:rareShots(m.i,d.a.length),given:m.name,ok:true,typed:m.exact?null:raw}:{x:null,given:raw,ok:false}; }
+    else { const g=parseNum(raw), x=raw&&Number.isFinite(g)?pinShots(g,d):7; a={x:x===7?null:x, given:Number.isFinite(g)?g:raw, ok:Number.isFinite(g)}; }
+    const base = S.attempt===1 ? 0 : (S.usingMull ? 0 : 2);
+    if(a.x){ const res={...a, shots:base+a.x, first:S.first, mull:S.usingMull}; S.res[S.idx]=res; animateShots(h,a.x,base+1,()=>showResult(h,d,res)); }
+    else if(S.attempt===1){ S.first=a; animateOB(h,1,()=>setupRetry(h,d,a)); }
+    else { const res={...a, shots:8, first:S.first, out:true, mull:S.usingMull}; S.res[S.idx]=res; animateOB(h,3,()=>showResult(h,d,res)); }
+  }
+
+  function setupRetry(h,d,a){
+    S.attempt=2;
+    setTimeout(()=>{ const o=$("svgOB"); if(o) o.setAttribute("opacity","0"); },600);
+    let why;
+    if(h.type==="R") why = a.given ? `“${esc(a.given)}” isn't on the card.` : "No answer.";
+    else if(Number.isFinite(a.given)) why = `${fmtNum(a.given,d)} is way off — the answer is <b style="display:inline">${a.given>d.ans?"lower ↓":"higher ↑"}</b>.`;
+    else why = "No guess.";
+    const canMull = !S.practice && P.mull>0 && S.mullUsed==null;
+    $("obNote").innerHTML=`<b>Out of bounds! Playing 3 off the tee.</b>${why} One more go — ${RETRY_SECONDS} seconds.`+
+      (canMull?`<div class="mull"><button class="btn primary" type="button" id="useMull">🔄 Use a mulligan — no penalty (${P.mull} left)</button></div>`:"");
+    $("obNote").classList.remove("hidden");
+    if(canMull) $("useMull").onclick=()=>{
+      P.mull--; saveP(); renderWallet(); S.mullUsed=S.idx; S.usingMull=true;
+      $("obNote").innerHTML=`<b>🔄 Mulligan! Back on the tee, no penalty.</b>${why} Your next answer counts from shot 1.`;
+      label("Mulligan · shot 1"); $("answerInput").focus();
+    };
+    const inp=$("answerInput"); inp.disabled=false; inp.value="";
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    startTimer(RETRY_SECONDS);
+  }
+
+  function showResult(h,d,res){
+    $("askPane").classList.add("hidden"); $("resultPane").classList.remove("hidden");
+    $("runTotal").textContent=toParStr(runningToPar()); $("svgOB").setAttribute("opacity","0"); showBadge(res.shots);
+    const term=$("term"); term.className="term t"+res.shots; term.textContent=TERMS[res.shots];
+    const shotsTxt=`${res.shots} shot${res.shots>1?"s":""}`;
+    let yours, facts;
+    const pre = res.first ? `<span class="tiny">Tee shot: ${h.type==="R"?(res.first.given?esc(res.first.given):"no answer"):(Number.isFinite(res.first.given)?fmtNum(res.first.given,d):"no guess")} — out of bounds${res.mull?" · 🔄 mulligan":""}</span><br>` : "";
+    if(h.type==="R"){
+      const names=d.a.map(first);
+      const aces=names.filter((_,i)=>rareShots(i,names.length)===1);
+      const pick=shuffled(aces.filter(x=>x!==res.given),rng(hashStr(d.id+S.key))).slice(0,3);
+      yours = res.ok ? `<b>${esc(res.given)}</b>${res.typed?` <span class="tiny">(spelling corrected)</span>`:""} · ${shotsTxt}` :
+              (res.given?`<b>${esc(res.given)}</b> isn't on the card either · picked up, ${shotsTxt}`:`No answer · picked up, ${shotsTxt}`);
+      facts = `<div><span class="k">Most people say</span>${names.slice(0,3).map(esc).join(", ")}</div>`+
+              (pick.length?`<div><span class="k">Hole-in-one answers</span>${pick.map(esc).join(", ")}</div>`:"")+
+              `<div class="tiny">${names.length} answers accepted on this hole</div>`;
+    } else {
+      const g=res.given;
+      if(Number.isFinite(g)){ const diff=Math.abs(g-d.ans), pct=d.mode==="rel"?` (${(diff/Math.abs(d.ans)*100).toFixed(1)}%)`:"";
+        yours=`<b>${fmtNum(g,d)}${d.unit?" "+d.unit:""}</b> · ${diff===0?"dead on":"off by "+fmtNum(+diff.toFixed(2),d)+pct} · ${shotsTxt}`; }
+      else yours=`No guess · picked up, ${shotsTxt}`;
+      facts=`<div><span class="k">The answer</span><b style="font-size:20px">${fmtNum(d.ans,d)}${d.unit?" "+d.unit:""}</b></div>`;
+    }
+    $("yours").innerHTML=pre+yours; $("facts").innerHTML=facts;
+    $("nextBtn").textContent = S.idx===HOLES-1 ? "See scorecard" : "Next hole";
+    saveRound(); $("nextBtn").focus({preventScroll:true});
+  }
+  function next(){ S.idx++; if(S.idx>=HOLES){ completeRound(); finish(); } else { saveRound(); playHole(); } }
+
+  function completeRound(){
+    S.done=true; S.earned=null;
+    if(!S.practice){
+      const firstTime = TEST_MODE || !P.paid[S.key];
+      const st=nextStreak(P,S.key);
+      if(firstTime){
+        P.rain-=st.rainUsed; P.streak=st.streak; P.bestStreak=Math.max(P.bestStreak,P.streak); P.lastDay=S.key;
+        const tp=runningToPar(); P.played++; P.totalToPar+=tp; P.best=P.best==null?tp:Math.min(P.best,tp);
+        const c=coinsFor(S.res,P.streak); P.coins+=c.total; S.earned={...c, rainUsed:st.rainUsed};
+        P.paid[S.key]=true; saveP();
+      }
+    }
+    saveRound();
+  }
+
+  function finish(){
+    show("final"); renderWallet();
+    const total=S.res.reduce((s,r)=>s+r.shots,0), tp=total-PAR*HOLES;
+    $("finalLabel").textContent = S.practice ? "Practice round" : `Course #${dayIndex(S.key)+1} · ${new Date(S.key+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}`;
+    const cell=i=>`<td><span class="mk s${S.res[i].shots}">${S.res[i].shots}</span></td>`;
+    $("scorecard").innerHTML=`<tr><th>Hole</th>${S.course.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr><tr><td>Par</td>${S.course.map(()=>`<td>${PAR}</td>`).join("")}</tr><tr><td>Score</td>${S.course.map((_,i)=>cell(i)).join("")}</tr>`;
+    $("finalTotal").textContent=total; $("finalVs").textContent=toParStr(tp);
+    $("finalVs").style.color=tp<0?"var(--birdie)":tp===0?"var(--par)":"var(--bogey)";
+    $("verdict").textContent = tp<=-12?"Tour-winning round.":tp<=-6?"Leading the clubhouse.":tp<0?"Under par — tidy golf.":tp===0?"Level par. Solid.":tp<=6?"A few dropped shots.":"Tough day on the links.";
+    const e=S.earned;
+    $("earn").classList.toggle("hidden",!e);
+    if(e) $("earn").innerHTML=`<div class="ln"><span class="tot">+${e.total} coins</span><span>🔥 ${P.streak}-day streak</span></div>`+
+      e.lines.map(l=>`<div class="ln"><span>${l[0]}</span><span>+${l[1]}</span></div>`).join("")+
+      (e.rainUsed?`<div class="ln"><span>🌧️ Rain delay used to save your streak</span><span>×${e.rainUsed}</span></div>`:"");
+    const em={1:"⛳",2:"🦅",3:"🐦",4:"🟩",5:"🟨",6:"🟧",7:"🟥",8:"⬛"};
+    const line=S.res.map(r=>em[r.shots]).join("");
+    const share=`Pin High ${S.practice?"(practice)":"#"+(dayIndex(S.key)+1)} · ${total} (${toParStr(tp)})${S.mullUsed!=null?" 🔄":""}\n${line}${!S.practice&&P.streak>1?`\n🔥 ${P.streak}-day streak`:""}`;
+    $("shareText").textContent=share;
+    $("copyBtn").onclick=async()=>{ try{ await navigator.clipboard.writeText(share); toast("Copied"); }catch(err){ toast("Select the text above to copy"); } };
+    $("replayBtn").classList.toggle("hidden",!TEST_MODE);
+    $("finalCountdown").textContent = S.practice ? "" : countdown();
+    let stars=0;
+    const paint=()=>$("stars").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.n<=stars));
+    $("stars").querySelectorAll("button").forEach(b=>b.onclick=()=>{ stars=+b.dataset.n; paint(); }); paint();
+    $("fbCopy").onclick=async()=>{
+      const msg=`Pin High feedback\n${"★".repeat(stars)}${"☆".repeat(5-stars)}${stars?"":" (no rating)"}\n${share}\n\n${$("fbText").value.trim()||"(no comments)"}`;
+      try{ await navigator.clipboard.writeText(msg); toast("Feedback copied — paste it in a message"); }
+      catch(err){ $("fbNote").textContent="Couldn't copy automatically — screenshot this or copy your comments by hand."; }
+    };
+    $("review").innerHTML=S.course.map((h,i)=>{
+      const d=h.ref, r=S.res[i];
+      const fg=x=>h.type==="R"?(x.given?esc(x.given)+(x.ok?"":" ✗"):"—"):(Number.isFinite(x.given)?fmtNum(x.given,d):"—");
+      const given=(r.first?fg(r.first)+(r.mull?" (OB, mulligan), then ":" (OB), then "):"")+fg(r)+(h.type==="P"?` → ${fmtNum(d.ans,d)}${d.unit?" "+d.unit:""}`:"");
+      return `<li><span class="n">${i+1}</span><span class="q">${esc(d.p)}<small>${given}</small></span><span class="mk s${r.shots}">${r.shots}</span></li>`;
+    }).join("");
+  }
+
+  function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1600); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  $("answerForm").addEventListener("submit",e=>{e.preventDefault(); submit(false);});
+  $("skipBtn").onclick=()=>{ $("answerInput").value=""; submit(false); };
+  $("sugYes").onclick=()=>submit(false,true);
+  $("sugNo").onclick=()=>{ hideSuggest(); const i=$("answerInput"); i.focus(); i.select(); };
+  $("answerInput").addEventListener("input",hideSuggest);
+  $("nextBtn").onclick=next;
+  $("startDaily").onclick=()=>start(false);
+  $("startPractice").onclick=()=>start(true);
+  $("againBtn").onclick=()=>start(true);
+  $("replayBtn").onclick=()=>start(false);
+  $("toHome").onclick=goHome;
+  $("homeLink").onclick=goHome;
+  $("buyMull").onclick=()=>buy("mull");
+  $("buyRain").onclick=()=>buy("rain");
+  $("testCoins").onclick=()=>{ P.coins+=300; saveP(); renderHome(); toast("+300 coins"); };
+  renderHome();
+})();
+</script>
+</body>
+</html>
