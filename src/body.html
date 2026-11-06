@@ -1,0 +1,622 @@
+<style>
+  .wallet{display:flex;gap:8px;margin:0 0 12px}
+  .wallet div{flex:1;background:rgba(255,255,255,.1);color:var(--cream);border-radius:14px;padding:9px 6px;text-align:center;font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:700}
+  .wallet b{display:block;font-family:Fraunces,Georgia,serif;font-size:22px;letter-spacing:0;text-transform:none;line-height:1.1}
+  .sect{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:19px;margin:22px 0 10px}
+  .shop{display:grid;gap:10px}
+  .item{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+  .item .ic{font-size:26px;flex:0 0 36px;text-align:center}
+  .item .tx{flex:1;font-size:14px;line-height:1.35}
+  .item .tx b{display:block;font-size:15px}
+  .item .btn{width:auto;padding:10px 12px;font-size:14px;white-space:nowrap}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stats div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:11px;color:var(--muted);line-height:1.2}
+  .stats b{display:block;font-family:Fraunces,Georgia,serif;font-size:22px;color:var(--ink)}
+  .earn{background:#fff6d9;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:14px;line-height:1.5}
+  .earn .tot{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px}
+  .earn .ln{display:flex;justify-content:space-between}
+  .mull{margin-top:10px}
+  .countdown{text-align:center;color:var(--muted);font-size:14px;margin:12px 0 0}
+  .stars{display:flex;gap:6px;margin:0 0 10px}
+  .stars button{background:none;border:0;font-size:32px;line-height:1;color:#d9d1bb;cursor:pointer;padding:0 2px}
+  .stars button.on{color:var(--gold)}
+  .fb textarea{width:100%;font:400 15px "DM Sans",sans-serif;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);resize:vertical;margin:0 0 10px;outline:none}
+  .fb textarea:focus{border-color:var(--ink)}
+  .rulesbox summary{cursor:pointer;font-weight:700;margin:4px 0 12px;color:var(--muted)}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="brand" id="homeLink">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><line x1="9" y1="3" x2="9" y2="23" stroke="#f7f2e4" stroke-width="2" stroke-linecap="round"/><path d="M10 3 L22 7.5 L10 12 Z" fill="#e4483b"/><ellipse cx="13" cy="23.5" rx="9" ry="2" fill="#8fd16a" opacity=".7"/></svg>
+      Pin High
+    </div>
+    <span class="pill" id="coursePill"></span>
+  </header>
+
+  <div class="wallet" id="wallet">
+    <div>Streak<b id="wStreak">0</b></div>
+    <div>Coins<b id="wCoins">0</b></div>
+    <div>Mulligans<b id="wMull">0</b></div>
+    <div>Rain delays<b id="wRain">0</b></div>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="card">
+    <div class="tiny" id="homeDate"></div>
+    <h1>Pin High</h1>
+    <p class="lede">A daily round of trivia golf. Nine holes, nine questions, par 36. Everyone plays the same course each day.</p>
+    <div class="stack">
+      <button class="btn primary" id="startDaily">Tee off</button>
+      <button class="btn ghost" id="startPractice">Practice round</button>
+    </div>
+    <p class="countdown hidden" id="homeCountdown"></p>
+
+    <details class="rulesbox" id="rulesBox" open>
+      <summary>How to play</summary>
+      <ul class="rules">
+        <li><span class="ic">🔎</span><span><b>Rare-find holes.</b> Name something that fits the prompt. The <i>rarer</i> your correct answer, the fewer shots.</span></li>
+        <li><span class="ic">📍</span><span><b>Closest-to-the-pin holes.</b> Guess a number. The <i>closer</i>, the fewer shots.</span></li>
+        <li><span class="ic">🚫</span><span><b>Wrong answer = out of bounds.</b> Play 3 off the tee: one more go with 2 shots already on the card. Miss again and you pick up with an 8.</span></li>
+        <li><span class="ic">🔄</span><span><b>Mulligan.</b> Out of bounds? Spend a mulligan to replay the hole with no penalty. One per round.</span></li>
+        <li><span class="ic">⏱️</span><span>25 seconds a hole, 15 for a second go.</span></li>
+      </ul>
+      <div class="ladder" aria-label="Rare-find scoring">
+        <div><b>5</b>Obvious</div><div><b>4</b>Familiar</div><div><b>3</b>Rare</div><div><b>2</b>Deep cut</div><div><b>1</b>Hole in one</div>
+      </div>
+    </details>
+
+    <div class="sect">Pro shop</div>
+    <div class="shop">
+      <div class="item"><span class="ic">🔄</span><span class="tx"><b>Mulligan · <span id="costMull"></span> coins</b>Replay an out-of-bounds hole with no penalty. Hold up to <span id="maxMull"></span>.</span><button class="btn primary" id="buyMull">Buy</button></div>
+      <div class="item"><span class="ic">🌧️</span><span class="tx"><b>Rain delay · <span id="costRain"></span> coins</b>Miss a day and your streak survives. Used automatically. Hold up to <span id="maxRain"></span>.</span><button class="btn primary" id="buyRain">Buy</button></div>
+    </div>
+    <p class="tiny" style="margin:10px 0 0">Earn coins on the daily course: ace 50 · eagle 20 · birdie 10 · par 5, plus bonuses for finishing, going under par and keeping your streak alive. Coins can't be bought.</p>
+    <button class="link hidden" id="testCoins" type="button">+300 coins (test mode)</button>
+
+    <div class="sect">Your stats</div>
+    <div class="stats">
+      <div><b id="sPlayed">0</b>Rounds</div>
+      <div><b id="sBest">–</b>Best</div>
+      <div><b id="sAvg">–</b>Average</div>
+      <div><b id="sBestStreak">0</b>Best streak</div>
+    </div>
+  </section>
+
+  <!-- HOLE -->
+  <section id="hole" class="hidden">
+    <div class="holehead">
+      <div><div class="h" id="holeTitle">Hole 1</div><div class="meta" id="holeMeta">Par 4</div></div>
+      <div class="topar" id="runTotal">E</div>
+    </div>
+    <div class="course"><div id="courseBox"></div><div class="badge hidden" id="badge"></div></div>
+    <div class="card">
+      <div id="askPane">
+        <div class="ob hidden" id="obNote"></div>
+        <span class="chip" id="chip">Rare find</span>
+        <p class="prompt" id="prompt"></p>
+        <div class="timer" id="timer"><i id="timerBar"></i></div>
+        <form class="answer" id="answerForm" autocomplete="off">
+          <input id="answerInput" type="text" placeholder="Your answer" autocapitalize="words" spellcheck="false" enterkeyhint="go">
+          <span class="unit" id="unit"></span>
+          <button class="btn primary" type="submit">Swing</button>
+        </form>
+        <div class="suggest hidden" id="suggest">
+          <span>Did you mean <b id="sugName"></b>?</span>
+          <div class="row"><button class="btn primary" type="button" id="sugYes">Yes, swing</button><button class="btn ghost" type="button" id="sugNo">No, retype</button></div>
+        </div>
+        <div class="under"><span class="tiny" id="hint"></span><button class="link" id="skipBtn" type="button">Pick up</button></div>
+      </div>
+      <div id="resultPane" class="result hidden">
+        <div class="term" id="term"></div>
+        <p class="yours" id="yours"></p>
+        <div class="facts" id="facts"></div>
+        <button class="btn primary" id="nextBtn">Next hole</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section id="final" class="card hidden">
+    <div class="tiny" id="finalLabel"></div>
+    <h2>Your scorecard</h2>
+    <table class="sc" id="scorecard"></table>
+    <div class="total"><span class="big" id="finalTotal"></span><span class="vs" id="finalVs"></span></div>
+    <p class="verdict" id="verdict"></p>
+    <div class="earn hidden" id="earn"></div>
+    <div class="share" id="shareText"></div>
+    <div class="stack">
+      <button class="btn flagb" id="copyBtn">Copy result</button>
+      <button class="btn primary hidden" id="replayBtn">Replay today's course (test mode)</button>
+      <button class="btn ghost" id="againBtn">Practice round</button>
+      <button class="btn ghost" id="toHome">Clubhouse</button>
+    </div>
+    <p class="countdown" id="finalCountdown"></p>
+    <div class="fb" id="feedback">
+      <div class="sect" style="margin-top:18px">What did you think?</div>
+      <div class="stars" id="stars"><button type="button" data-n="1" aria-label="1 out of 5">★</button><button type="button" data-n="2" aria-label="2 out of 5">★</button><button type="button" data-n="3" aria-label="3 out of 5">★</button><button type="button" data-n="4" aria-label="4 out of 5">★</button><button type="button" data-n="5" aria-label="5 out of 5">★</button></div>
+      <textarea id="fbText" rows="3" placeholder="Too hard? Too easy? A question you think is wrong? Anything you'd change?"></textarea>
+      <button class="btn primary" id="fbCopy" type="button">Copy feedback to send</button>
+      <p class="tiny" id="fbNote" style="margin:6px 0 0">Copies your score and comments so you can paste them into a message.</p>
+    </div>
+    <ul class="review" id="review"></ul>
+    <p class="tiny" style="margin-top:14px">Rarity is currently an estimate of how often people give each answer.</p>
+  </section>
+</div>
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/*DATA*/
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+const TEST_MODE = false;         // true = unlimited replays of the daily course + free test coins
+const LAUNCH = "2026-11-06";     // Course #1
+const PAR = 4, HOLES = 9, SECONDS = 25, RETRY_SECONDS = 15;
+const LAYOUT = ["R","P","R","R","P","R","R","P","R"];  // 6 rare-find, 3 closest-to-the-pin
+const TERMS = {1:"Hole in one!",2:"Eagle",3:"Birdie",4:"Par",5:"Bogey",6:"Double bogey",7:"Triple bogey",8:"Quadruple bogey"};
+const SHOP = { mull:{cost:100,max:3}, rain:{cost:150,max:2} };
+const EARN = { hole:{1:50,2:20,3:10,4:5}, finish:10, underPar:20, streakPer:5, streakCap:50 };
+
+/* =========================================================
+   CONTENT: build the prompt pools
+   ========================================================= */
+function first(s){ return s.split("|")[0]; }
+function buildRare(){
+  const out=[];
+  const add=(id,p,list,fam)=>{ if(list.length>=4) out.push({id,p,a:list,fam:fam||id}); };
+  const C=COUNTRIES.map(([n,c,cap])=>({n,c:c.split(" "),cap}));
+  const contName={EU:"Name a country in Europe (England, Scotland etc. count)",AS:"Name a country in Asia",AF:"Name a country in Africa",NA:"Name a country in North America, Central America or the Caribbean",SA:"Name a country in South America",OC:"Name a country in Oceania"};
+  for(const k in contName) add("c-"+k, contName[k], C.filter(x=>x.c.includes(k)).map(x=>x.n), "country");
+  const capName={EU:"Name the capital city of a European country",AS:"Name the capital city of an Asian country",AF:"Name the capital city of an African country",AM:"Name the capital city of a country in the Americas",OC:"Name the capital city of a country in Oceania"};
+  for(const k in capName){
+    const seen=new Set(), list=[];
+    for(const x of C){ const inK = k==="AM" ? (x.c.includes("NA")||x.c.includes("SA")) : x.c.includes(k); if(!inK) continue;
+      const f=norm(first(x.cap)); if(seen.has(f)) continue; seen.add(f); list.push(x.cap); }
+    add("cap-"+k, capName[k], list, "capital");
+  }
+  for(const L of "ABCGILMNPST"){ const list=C.filter(x=>norm(first(x.n))[0]===L.toLowerCase()).map(x=>x.n); if(list.length>=7) add("cl-"+L,`Name a country beginning with ${L}`,list,"country-letter"); }
+  add("c-ia","Name a country whose name ends in -ia",C.filter(x=>/ia$/.test(norm(first(x.n)))).map(x=>x.n),"country-letter");
+  add("c-land","Name a country whose name ends in -land",C.filter(x=>/land$/.test(norm(first(x.n)))).map(x=>x.n),"country");
+  for(const L of "BMSP"){ const seen=new Set(), list=[];
+    for(const x of C){ const f=norm(first(x.cap)); if(f[0]!==L.toLowerCase()||seen.has(f)) continue; seen.add(f); list.push(x.cap); }
+    add("capl-"+L,`Name a capital city beginning with ${L}`,list,"capital"); }
+  add("el-any","Name a chemical element",ELEMENTS.map(e=>e[0]),"element");
+  add("el-ium","Name a chemical element ending in -ium",ELEMENTS.filter(e=>/ium$/.test(norm(first(e[0])))).map(e=>e[0]),"element");
+  add("el-1","Name an element whose chemical symbol is a single letter",ELEMENTS.filter(e=>e[1].length===1).map(e=>e[0]),"element");
+  for(const L of "CBNS") add("el-"+L,`Name a chemical element beginning with ${L}`,ELEMENTS.filter(e=>norm(first(e[0]))[0]===L.toLowerCase()).map(e=>e[0]),"element");
+  add("us-any","Name a US state",STATES.map(s=>s[0]),"usa");
+  add("us-cap","Name a US state capital",STATE_CAPITAL_FAME.map(c=>{const s=STATES.find(x=>norm(first(x[1]))===norm(c)); return s?s[1]:c;}),"usa");
+  add("us-M","Name a US state beginning with M",STATES.filter(s=>s[0][0]==="M").map(s=>s[0]),"usa");
+  add("us-N","Name a US state beginning with N",STATES.filter(s=>s[0][0]==="N").map(s=>s[0]),"usa");
+  add("us-2","Name a US state with a two-word name",STATES.filter(s=>s[0].includes(" ")).map(s=>s[0]),"usa");
+  const famOf={g7:"country",unsc:"country",eu_members:"country","eu-members":"country","germany-borders":"country","france-borders":"country","china-borders":"country","olympic-hosts":"country","wc-hosts":"country",
+    "noble-gases":"element","odd-symbols":"element","planets":"space","constellations":"space","beatles":"band","spice-girls":"band","one-direction":"band","take-that":"band","queen-band":"band",
+    "golf-clubs":"golf","golf-scores":"golf","open-venues":"golf","golf-majors":"golf","open-winners":"golf","greek-gods":"myth","roman-gods":"myth","norse-gods":"myth",
+    "tudors":"royals","monarchs-1714":"royals","henry-wives":"royals","scottish-cities":"ukplaces","welsh-cities":"ukplaces","zodiac":"zodiac","chinese-zodiac":"zodiac"};
+  for(const h of HAND){ const [id,p,a,theme]=h; const r={id,p,a:a.split(";"),fam:famOf[id]||id}; if(theme) r.theme=theme; out.push(r); }
+  return out;
+}
+function buildPins(){
+  return PINS.map(([p,ans,unit,kind],i)=>{
+    let mode="abs", bands, fmt="";
+    if(Array.isArray(kind)) bands=kind;
+    else if(kind==="y"){ fmt="year"; bands = ans>=1800?[0,1,3,8,20,50] : ans>=1000?[0,3,10,30,75,150] : [0,5,20,50,100,200]; }
+    else if(kind==="c"){ const c=x=>Math.max(1,Math.ceil(ans*x)); bands=[0,c(.04),c(.1),c(.25),c(.5),c(1)]; }
+    else { mode="rel"; bands=[0.01,0.05,0.12,0.25,0.5,1]; }
+    return {id:"pin"+i,p,ans,unit,mode,bands,fmt};
+  });
+}
+
+/* =========================================================
+   LOGIC (pure)
+   ========================================================= */
+function norm(s){
+  return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+    .replace(/&/g," and ").replace(/\bpt\b\.?/g,"part")
+    .replace(/[’'`.,!?:;()"*\-]/g," ").replace(/^\s*the\s+/,"").replace(/\s+/g," ").trim();
+}
+function lev(a,b){
+  if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,i)=>i), cur=new Array(n+1);
+  for(let i=1;i<=m;i++){ cur[0]=i; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); [prev,cur]=[cur,prev]; }
+  return prev[n];
+}
+// "St" can mean Saint or Street: try every reading
+function stForms(k){ return [k, k.replace(/\bst\b/g,"saint"), k.replace(/\bst\b/g,"street"), k.replace(/\bsaint\b/g,"st")]; }
+function rareShots(i,n){ if(i===n-1) return 1; const p=i/n; return p<0.12?5:p<0.32?4:p<0.6?3:p<0.85?2:1; }
+function matchRare(input, list){
+  const q=norm(input); if(!q) return null;
+  const entries=list.map((s,i)=>({i,name:first(s),keys:[...new Set(s.split("|").map(norm).flatMap(stForms))]}));
+  for(const v of stForms(q)) for(const e of entries) if(e.keys.includes(v)) return {...e, exact:true};
+  let best=null,bd=99;
+  for(const e of entries) for(const k of e.keys){
+    const allow = k.length>=10?3 : k.length>=6?2 : k.length>=4?1 : 0; if(!allow) continue;
+    const d=lev(q,k); if(d<=allow && d<bd){bd=d;best=e;}
+  }
+  return best ? {...best, exact:false} : null;
+}
+function parseNum(s){
+  const t=String(s).toLowerCase().replace(/,/g,"").replace(/\s+/g,"");
+  const m=t.match(/^(-?\d*\.?\d+)(k|thousand|mil|million|bn|billion)?/); if(!m) return NaN;
+  const mult={k:1e3,thousand:1e3,mil:1e6,million:1e6,bn:1e9,billion:1e9}[m[2]]||1;
+  return parseFloat(m[1])*mult;
+}
+function pinShots(guess,q){
+  if(!Number.isFinite(guess)) return 7;
+  const err = q.mode==="rel" ? Math.abs(guess-q.ans)/Math.abs(q.ans) : Math.abs(guess-q.ans);
+  for(let i=0;i<q.bands.length;i++) if(err<=q.bands[i]+1e-9) return i+1;
+  return 7;
+}
+function hashStr(s){ let h=2166136261; for(const c of s){ h^=c.charCodeAt(0); h=Math.imul(h,16777619);} return h>>>0; }
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffled(arr,r){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function toParStr(n){ return n===0?"E":(n>0?"+"+n:String(n)); }
+function localKey(d){ const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function dayIndex(key){ return Math.round((Date.parse(key+"T12:00:00Z")-Date.parse(LAUNCH+"T12:00:00Z"))/864e5); }
+function addDays(key,n){ const d=new Date(key+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); }
+function fmtNum(v,q){ if(q && q.fmt==="year") return String(v); return Number(v).toLocaleString("en-GB",{maximumFractionDigits:2}); }
+
+const RARE_ALL = buildRare(), PIN_ALL = buildPins();
+const RARE_POOL = RARE_ALL.filter(r=>!r.theme), PIN_POOL = PIN_ALL;
+
+// Fixed season order. Rare prompts are ordered so no two from the same family land within 6 slots of each other.
+function seasonOrder(){
+  const r=rng(hashStr("pinhigh-season-1"));
+  let pool=shuffled(RARE_POOL,r), order=[];
+  while(pool.length){
+    const recent=new Set(order.slice(-6).map(x=>x.fam));
+    let k=pool.findIndex(x=>!recent.has(x.fam)); if(k<0) k=0;
+    order.push(pool.splice(k,1)[0]);
+  }
+  return {rare:order, pins:shuffled(PIN_POOL,r)};
+}
+const SEASON = seasonOrder();
+// Fixed calendar (src/schedule.js) wins; dates beyond it fall back to the season rotation.
+const BY_ID = Object.fromEntries([...RARE_ALL,...PIN_ALL].map(x=>[x.id,x]));
+function courseFor(key){
+  const ids = (typeof SCHEDULE!=="undefined") && SCHEDULE[key];
+  if(ids && ids.every(id=>BY_ID[id])){
+    const r=rng(hashStr("layout"+key));
+    return ids.map((id,i)=>({type:LAYOUT[i], ref:BY_ID[id], layout:{a:r(),b:r(),c:r(),d:r()}}));
+  }
+  return courseForAlgo(key);
+}
+function courseForAlgo(key){
+  const n=Math.max(0,dayIndex(key)), R=SEASON.rare.length, P=SEASON.pins.length, r=rng(hashStr("layout"+key));
+  let ri=n*6, pi=n*3;
+  const holes=LAYOUT.map(t=> t==="R" ? {type:"R", ref:SEASON.rare[(ri++)%R]} : {type:"P", ref:SEASON.pins[(pi++)%P]});
+  const themed=RARE_ALL.filter(x=>x.theme && x.theme===key.slice(5));
+  themed.forEach((t,i)=>{ const slot=holes.findIndex((h,j)=>h.type==="R" && j>=i*3); if(slot>=0) holes[slot]={type:"R",ref:t}; });
+  holes.forEach(h=>h.layout={a:r(),b:r(),c:r(),d:r()});
+  return holes;
+}
+function practiceCourse(){
+  const r=Math.random; const rs=shuffled(RARE_POOL,r), ps=shuffled(PIN_POOL,r); let i=0,j=0;
+  return LAYOUT.map(t=>({type:t, ref: t==="R"?rs[i++]:ps[j++], layout:{a:r(),b:r(),c:r(),d:r()}}));
+}
+// streak: returns {streak, rainUsed}
+function nextStreak(prof, key){
+  if(prof.lastDay===key) return {streak:prof.streak, rainUsed:0};
+  if(!prof.lastDay) return {streak:1, rainUsed:0};
+  const gap=dayIndex(key)-dayIndex(prof.lastDay)-1;   // days missed
+  if(gap<=0) return {streak:prof.streak+1, rainUsed:0};
+  if(gap<=prof.rain) return {streak:prof.streak+1, rainUsed:gap};
+  return {streak:1, rainUsed:0};
+}
+function coinsFor(res, streak){
+  const lines=[]; let holeCoins=0;
+  res.forEach(r=>{ holeCoins+=EARN.hole[r.shots]||0; });
+  if(holeCoins) lines.push(["Birdies, eagles & pars",holeCoins]);
+  lines.push(["Round completed",EARN.finish]);
+  const tp=res.reduce((s,r)=>s+r.shots-PAR,0);
+  if(tp<0) lines.push(["Under par",EARN.underPar]);
+  const sb=Math.min(EARN.streakCap,EARN.streakPer*streak); if(streak>1) lines.push([`${streak}-day streak`,sb]);
+  return {lines,total:lines.reduce((s,l)=>s+l[1],0)};
+}
+
+if (typeof module!=="undefined") module.exports={RARE_ALL,PIN_ALL,RARE_POOL,PIN_POOL,LAYOUT,BY_ID,SCHEDULE:(typeof SCHEDULE!=="undefined"?SCHEDULE:{}),SEASON,courseFor,courseForAlgo,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
+
+/* =========================================================
+   UI
+   ========================================================= */
+if (typeof document!=="undefined") (function(){
+  const $=id=>document.getElementById(id);
+  const store={ get(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} },
+                set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} } };
+  const PROFILE_KEY="pinhigh-profile-v1";
+  const blank={coins:0, mull:1, rain:0, streak:0, bestStreak:0, lastDay:null, played:0, totalToPar:0, best:null, paid:{}};
+  let P=Object.assign({},blank,store.get(PROFILE_KEY)||{});
+  const saveP=()=>store.set(PROFILE_KEY,P);
+  const todayKey=localKey(new Date()), courseNo=dayIndex(todayKey)+1;
+  let S=null, timer=null, tStart=0;
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- clubhouse ---------- */
+  function liveStreak(){ // streak shown today: broken if a gap can't be covered
+    if(!P.lastDay) return 0;
+    const gap=dayIndex(todayKey)-dayIndex(P.lastDay)-1;
+    return gap<=0 || gap<=P.rain ? P.streak : 0;
+  }
+  function renderWallet(){
+    $("wStreak").textContent=(liveStreak()?"🔥":"")+liveStreak(); $("wCoins").textContent=P.coins;
+    $("wMull").textContent=P.mull; $("wRain").textContent=P.rain;
+  }
+  function renderHome(){
+    renderWallet();
+    $("coursePill").textContent = TEST_MODE ? "Test mode" : "Course #"+courseNo;
+    $("homeDate").textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Course #${courseNo}`;
+    const saved=store.get("pinhigh-"+todayKey), done=!TEST_MODE && saved && saved.done;
+    $("startDaily").textContent = done ? "See today's scorecard" : (!TEST_MODE && saved && saved.res && saved.res.length ? "Resume today's round" : "Tee off");
+    $("homeCountdown").classList.toggle("hidden",!done); if(done) $("homeCountdown").textContent=countdown();
+    $("rulesBox").open = !P.played;
+    $("costMull").textContent=SHOP.mull.cost; $("maxMull").textContent=SHOP.mull.max;
+    $("costRain").textContent=SHOP.rain.cost; $("maxRain").textContent=SHOP.rain.max;
+    $("buyMull").disabled = P.coins<SHOP.mull.cost || P.mull>=SHOP.mull.max;
+    $("buyRain").disabled = P.coins<SHOP.rain.cost || P.rain>=SHOP.rain.max;
+    $("buyMull").textContent = P.mull>=SHOP.mull.max ? "Full" : "Buy";
+    $("buyRain").textContent = P.rain>=SHOP.rain.max ? "Full" : "Buy";
+    $("sPlayed").textContent=P.played; $("sBest").textContent=P.best==null?"–":toParStr(P.best);
+    $("sAvg").textContent=P.played?toParStr(Math.round(P.totalToPar/P.played*10)/10):"–"; $("sBestStreak").textContent=P.bestStreak;
+    $("testCoins").classList.toggle("hidden",!TEST_MODE);
+  }
+  function buy(kind){
+    const it=SHOP[kind]; if(P.coins<it.cost || P[kind]>=it.max) return;
+    P.coins-=it.cost; P[kind]++; saveP(); renderHome(); toast(kind==="mull"?"Mulligan added 🔄":"Rain delay added 🌧️");
+  }
+  function countdown(){
+    const now=new Date(), mid=new Date(now); mid.setHours(24,0,0,0);
+    const m=Math.round((mid-now)/60000); return `Next course in ${Math.floor(m/60)}h ${m%60}m`;
+  }
+  function show(id){ ["home","hole","final"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); window.scrollTo({top:0}); }
+  function goHome(){ stopTimer(); renderHome(); show("home"); }
+
+  /* ---------- round ---------- */
+  function start(practice){
+    const saved = TEST_MODE ? null : store.get("pinhigh-"+todayKey);
+    if(!practice && saved && saved.done){ S=hydrate(saved); return finish(); }
+    if(!practice && saved && saved.res){ S=hydrate(saved); return playHole(); }
+    S={practice, key:todayKey, course: practice?practiceCourse():courseFor(todayKey), idx:0, res:[], done:false, mullUsed:null};
+    playHole();
+  }
+  // saved rounds store prompt ids; rebuild references
+  function dehydrate(s){ return {...s, course:s.course.map(h=>({type:h.type, id:h.ref.id, layout:h.layout}))}; }
+  function hydrate(s){ return {...s, course:s.course.map(h=>({type:h.type, layout:h.layout, ref:(h.type==="R"?RARE_ALL:PIN_ALL).find(x=>x.id===h.id)}))}; }
+  function saveRound(){ if(!S.practice && !TEST_MODE) store.set("pinhigh-"+S.key, dehydrate(S)); }
+  const runningToPar=()=>S.res.reduce((s,r)=>s+r.shots-PAR,0);
+
+  /* ---------- drawing ---------- */
+  function geom(h){ const L=h.layout, W=340, H=190;
+    return {W,H,tee:{x:40,y:150+L.a*18}, pin:{x:280+L.b*25,y:36+L.c*30}, ctrl:{x:120+L.d*120,y:L.a>0.5?40+L.b*40:150+L.c*20}}; }
+  function bez(g,t){ const u=1-t; return {x:u*u*g.tee.x+2*u*t*g.ctrl.x+t*t*g.pin.x, y:u*u*g.tee.y+2*u*t*g.ctrl.y+t*t*g.pin.y}; }
+  function drawHole(h){
+    const g=geom(h), L=h.layout, bunk=bez(g,0.55+L.c*0.2), by=bunk.y+(L.d>0.5?30:-30);
+    $("courseBox").innerHTML=`
+    <svg viewBox="0 0 ${g.W} ${g.H}" role="img" aria-label="Hole layout">
+      <defs><pattern id="stripe" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="24" height="24" fill="var(--fairway)"/><rect width="12" height="24" fill="var(--fairway2)"/></pattern>
+      <radialGradient id="gr" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#a4e07e"/><stop offset="1" stop-color="#78c057"/></radialGradient></defs>
+      <rect width="${g.W}" height="${g.H}" fill="#2a5e33"/>
+      ${[...Array(14)].map((_,i)=>`<circle cx="${(i*53+L.a*90)%g.W}" cy="${(i*37+L.b*70)%g.H}" r="${9+(i%3)*4}" fill="#1f4d2b" opacity=".8"/>`).join("")}
+      <path d="M${g.tee.x} ${g.tee.y} Q${g.ctrl.x} ${g.ctrl.y} ${g.pin.x} ${g.pin.y}" stroke="#4d8c3c" stroke-width="50" fill="none" stroke-linecap="round"/>
+      <path d="M${g.tee.x} ${g.tee.y} Q${g.ctrl.x} ${g.ctrl.y} ${g.pin.x} ${g.pin.y}" stroke="url(#stripe)" stroke-width="40" fill="none" stroke-linecap="round"/>
+      <ellipse cx="${bunk.x}" cy="${by}" rx="18" ry="10" fill="var(--sand)"/>
+      <ellipse cx="${g.pin.x}" cy="${g.pin.y}" rx="30" ry="24" fill="url(#gr)"/>
+      <rect x="${g.tee.x-10}" y="${g.tee.y-7}" width="20" height="14" rx="4" fill="#9ad37a"/>
+      <ellipse cx="${g.pin.x}" cy="${g.pin.y+1}" rx="3.2" ry="2" fill="#16301c"/>
+      <line x1="${g.pin.x}" y1="${g.pin.y}" x2="${g.pin.x}" y2="${g.pin.y-30}" stroke="#fff" stroke-width="1.6"/>
+      <path d="M${g.pin.x} ${g.pin.y-30} l14 4.5 l-14 4.5z" fill="var(--flag)"/>
+      <g id="shots"></g>
+      <text id="svgOB" opacity="0" x="${g.W/2}" y="${g.H/2+8}" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-weight="800" font-size="26" fill="#fff" stroke="#c0392b" stroke-width="5" paint-order="stroke" style="transition:opacity .2s">OUT OF BOUNDS</text>
+      <ellipse id="shadow" cx="${g.tee.x}" cy="${g.tee.y+2}" rx="4" ry="1.6" fill="#000" opacity=".3"/>
+      <circle id="ball" cx="${g.tee.x}" cy="${g.tee.y}" r="3.6" fill="#fff" stroke="#ccc" stroke-width=".6"/>
+      <text x="12" y="22" font-family="Fraunces,Georgia,serif" font-weight="800" font-size="15" fill="#f7f2e4">${S.idx+1}</text>
+      <text id="shotCount" x="${g.W-12}" y="22" text-anchor="end" font-family="DM Sans,sans-serif" font-weight="700" font-size="12" fill="#f7f2e4" opacity="0"></text>
+    </svg>`;
+  }
+  function placeBall(p){ $("ball").setAttribute("cx",p.x); $("ball").setAttribute("cy",p.y); $("ball").setAttribute("r","3.6"); $("shadow").setAttribute("cx",p.x); $("shadow").setAttribute("cy",p.y+2); }
+  function label(t){ const l=$("shotCount"); l.setAttribute("opacity",".95"); l.textContent=t; }
+  function fly(from,to,cb,red){
+    const ball=$("ball"), sh=$("shadow"), trail=$("shots");
+    const dist=Math.hypot(to.x-from.x,to.y-from.y), dur=reduce?1:Math.max(450,Math.min(900,dist*4.2)), t0=performance.now();
+    trail.insertAdjacentHTML("beforeend",`<path d="M${from.x} ${from.y} Q${(from.x+to.x)/2} ${Math.min(from.y,to.y)-dist*0.35} ${to.x} ${to.y}" stroke="${red?"#ff8a7a":"#fff"}" stroke-opacity="0" stroke-width="1.2" fill="none" stroke-dasharray="2 3"/>`);
+    const tr=trail.lastElementChild;
+    (function step(now){
+      const t=Math.min(1,(now-t0)/dur), x=from.x+(to.x-from.x)*t, y=from.y+(to.y-from.y)*t, lift=Math.sin(Math.PI*t)*dist*0.28;
+      ball.setAttribute("cx",x); ball.setAttribute("cy",y-lift); ball.setAttribute("r",3.6+lift*0.06); sh.setAttribute("cx",x); sh.setAttribute("cy",y+2);
+      if(t<1) requestAnimationFrame(step); else { tr.setAttribute("stroke-opacity",".55"); cb(); }
+    })(t0);
+  }
+  function animateShots(h,hops,firstNum,cb){
+    const g=geom(h), r=rng(hashStr("anim"+S.idx+hops+firstNum)), pts=[];
+    for(let k=1;k<=hops;k++){ const p=bez(g,k/hops), off=k===hops?0:(r()-0.5)*26; pts.push({x:p.x+off*0.4,y:p.y+off}); }
+    let i=0, from={...g.tee}; placeBall(g.tee);
+    (function hop(){
+      if(i>=pts.length){ $("ball").setAttribute("r","2.2"); setTimeout(cb,reduce?0:350); return; }
+      label("Shot "+(firstNum+i)); fly(from,pts[i],()=>{ from=pts[i]; i++; setTimeout(hop,reduce?0:280); });
+    })();
+  }
+  function animateOB(h,shotNum,cb){
+    const g=geom(h), r=rng(hashStr("ob"+S.idx+shotNum)); placeBall(g.tee); label("Shot "+shotNum);
+    const mid=bez(g,0.45), side=r()<0.5?-1:1, to={x:mid.x+side*30, y:side<0?-30:g.H+30};
+    $("svgOB").setAttribute("opacity","0");
+    fly(g.tee,to,()=>{ $("svgOB").setAttribute("opacity","1");
+      setTimeout(()=>{ placeBall(g.tee); label(shotNum<3?"Penalty · playing 3":"Picked up"); cb(); }, reduce?0:900); },true);
+  }
+  function showBadge(shots){
+    const tp=shots-PAR;
+    $("badge").innerHTML=`<div class="c${shots}"><div class="num">${shots}</div><div class="nm">${TERMS[shots].replace("!","")}</div><div class="tp">${tp===0?"Level":toParStr(tp)}</div></div>`;
+    $("badge").classList.remove("hidden");
+  }
+
+  /* ---------- play ---------- */
+  function playHole(){
+    show("hole"); renderWallet();
+    const h=S.course[S.idx], d=h.ref;
+    $("holeTitle").textContent=`Hole ${S.idx+1}`;
+    $("holeMeta").textContent=`Par ${PAR} · ${S.idx+1} of ${HOLES}${S.practice?" · practice":""}`;
+    $("runTotal").textContent=toParStr(runningToPar());
+    drawHole(h);
+    $("askPane").classList.remove("hidden"); $("resultPane").classList.add("hidden");
+    $("badge").classList.add("hidden"); $("obNote").classList.add("hidden");
+    S.attempt=1; S.first=null; S.usingMull=false;
+    const isPin=h.type==="P";
+    $("chip").textContent=isPin?"📍 Closest to the pin":"🔎 Rare find"; $("chip").classList.toggle("pin",isPin);
+    $("prompt").textContent=d.p;
+    $("hint").textContent=isPin?"Closer guess = fewer shots":"Rarer answer = fewer shots";
+    $("unit").textContent=isPin?(d.unit||""):"";
+    const inp=$("answerInput"); inp.value=""; inp.disabled=false; hideSuggest();
+    inp.setAttribute("inputmode",isPin?"decimal":"text"); inp.placeholder=isPin?"Your guess":"Your answer";
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    startTimer(SECONDS);
+  }
+  function startTimer(secs){
+    stopTimer(); tStart=performance.now(); const bar=$("timerBar"), box=$("timer"); box.classList.remove("warn");
+    (function tick(now){ const left=Math.max(0,1-(now-tStart)/(secs*1000)); bar.style.transform=`scaleX(${left})`;
+      if(left<0.25) box.classList.add("warn"); if(left<=0){ submit(true); return; } timer=requestAnimationFrame(tick); })(tStart);
+  }
+  function stopTimer(){ if(timer) cancelAnimationFrame(timer); timer=null; }
+  function hideSuggest(){ $("suggest").classList.add("hidden"); }
+
+  function submit(timedOut, confirmed){
+    if(!S || $("askPane").classList.contains("hidden") || $("answerInput").disabled) return;
+    const h=S.course[S.idx], d=h.ref, raw=$("answerInput").value.trim();
+    if(h.type==="R" && !timedOut && !confirmed && raw){
+      const m=matchRare(raw,d.a);
+      if(m && !m.exact){ $("sugName").textContent=m.name; $("suggest").classList.remove("hidden"); $("sugYes").focus({preventScroll:true}); return; }
+    }
+    stopTimer(); hideSuggest(); $("answerInput").disabled=true; $("answerInput").blur();
+    let a;
+    if(h.type==="R"){ const m=matchRare(raw,d.a); a = m?{x:rareShots(m.i,d.a.length),given:m.name,ok:true,typed:m.exact?null:raw}:{x:null,given:raw,ok:false}; }
+    else { const g=parseNum(raw), x=raw&&Number.isFinite(g)?pinShots(g,d):7; a={x:x===7?null:x, given:Number.isFinite(g)?g:raw, ok:Number.isFinite(g)}; }
+    const base = S.attempt===1 ? 0 : (S.usingMull ? 0 : 2);
+    if(a.x){ const res={...a, shots:base+a.x, first:S.first, mull:S.usingMull}; S.res[S.idx]=res; animateShots(h,a.x,base+1,()=>showResult(h,d,res)); }
+    else if(S.attempt===1){ S.first=a; animateOB(h,1,()=>setupRetry(h,d,a)); }
+    else { const res={...a, shots:8, first:S.first, out:true, mull:S.usingMull}; S.res[S.idx]=res; animateOB(h,3,()=>showResult(h,d,res)); }
+  }
+
+  function setupRetry(h,d,a){
+    S.attempt=2;
+    setTimeout(()=>{ const o=$("svgOB"); if(o) o.setAttribute("opacity","0"); },600);
+    let why;
+    if(h.type==="R") why = a.given ? `“${esc(a.given)}” isn't on the card.` : "No answer.";
+    else if(Number.isFinite(a.given)) why = `${fmtNum(a.given,d)} is way off — the answer is <b style="display:inline">${a.given>d.ans?"lower ↓":"higher ↑"}</b>.`;
+    else why = "No guess.";
+    const canMull = !S.practice && P.mull>0 && S.mullUsed==null;
+    $("obNote").innerHTML=`<b>Out of bounds! Playing 3 off the tee.</b>${why} One more go — ${RETRY_SECONDS} seconds.`+
+      (canMull?`<div class="mull"><button class="btn primary" type="button" id="useMull">🔄 Use a mulligan — no penalty (${P.mull} left)</button></div>`:"");
+    $("obNote").classList.remove("hidden");
+    if(canMull) $("useMull").onclick=()=>{
+      P.mull--; saveP(); renderWallet(); S.mullUsed=S.idx; S.usingMull=true;
+      $("obNote").innerHTML=`<b>🔄 Mulligan! Back on the tee, no penalty.</b>${why} Your next answer counts from shot 1.`;
+      label("Mulligan · shot 1"); $("answerInput").focus();
+    };
+    const inp=$("answerInput"); inp.disabled=false; inp.value="";
+    setTimeout(()=>inp.focus({preventScroll:true}),50);
+    startTimer(RETRY_SECONDS);
+  }
+
+  function showResult(h,d,res){
+    $("askPane").classList.add("hidden"); $("resultPane").classList.remove("hidden");
+    $("runTotal").textContent=toParStr(runningToPar()); $("svgOB").setAttribute("opacity","0"); showBadge(res.shots);
+    const term=$("term"); term.className="term t"+res.shots; term.textContent=TERMS[res.shots];
+    const shotsTxt=`${res.shots} shot${res.shots>1?"s":""}`;
+    let yours, facts;
+    const pre = res.first ? `<span class="tiny">Tee shot: ${h.type==="R"?(res.first.given?esc(res.first.given):"no answer"):(Number.isFinite(res.first.given)?fmtNum(res.first.given,d):"no guess")} — out of bounds${res.mull?" · 🔄 mulligan":""}</span><br>` : "";
+    if(h.type==="R"){
+      const names=d.a.map(first);
+      const aces=names.filter((_,i)=>rareShots(i,names.length)===1);
+      const pick=shuffled(aces.filter(x=>x!==res.given),rng(hashStr(d.id+S.key))).slice(0,3);
+      yours = res.ok ? `<b>${esc(res.given)}</b>${res.typed?` <span class="tiny">(spelling corrected)</span>`:""} · ${shotsTxt}` :
+              (res.given?`<b>${esc(res.given)}</b> isn't on the card either · picked up, ${shotsTxt}`:`No answer · picked up, ${shotsTxt}`);
+      facts = `<div><span class="k">Most people say</span>${names.slice(0,3).map(esc).join(", ")}</div>`+
+              (pick.length?`<div><span class="k">Hole-in-one answers</span>${pick.map(esc).join(", ")}</div>`:"")+
+              `<div class="tiny">${names.length} answers accepted on this hole</div>`;
+    } else {
+      const g=res.given;
+      if(Number.isFinite(g)){ const diff=Math.abs(g-d.ans), pct=d.mode==="rel"?` (${(diff/Math.abs(d.ans)*100).toFixed(1)}%)`:"";
+        yours=`<b>${fmtNum(g,d)}${d.unit?" "+d.unit:""}</b> · ${diff===0?"dead on":"off by "+fmtNum(+diff.toFixed(2),d)+pct} · ${shotsTxt}`; }
+      else yours=`No guess · picked up, ${shotsTxt}`;
+      facts=`<div><span class="k">The answer</span><b style="font-size:20px">${fmtNum(d.ans,d)}${d.unit?" "+d.unit:""}</b></div>`;
+    }
+    $("yours").innerHTML=pre+yours; $("facts").innerHTML=facts;
+    $("nextBtn").textContent = S.idx===HOLES-1 ? "See scorecard" : "Next hole";
+    saveRound(); $("nextBtn").focus({preventScroll:true});
+  }
+  function next(){ S.idx++; if(S.idx>=HOLES){ completeRound(); finish(); } else { saveRound(); playHole(); } }
+
+  function completeRound(){
+    S.done=true; S.earned=null;
+    if(!S.practice){
+      const firstTime = TEST_MODE || !P.paid[S.key];
+      const st=nextStreak(P,S.key);
+      if(firstTime){
+        P.rain-=st.rainUsed; P.streak=st.streak; P.bestStreak=Math.max(P.bestStreak,P.streak); P.lastDay=S.key;
+        const tp=runningToPar(); P.played++; P.totalToPar+=tp; P.best=P.best==null?tp:Math.min(P.best,tp);
+        const c=coinsFor(S.res,P.streak); P.coins+=c.total; S.earned={...c, rainUsed:st.rainUsed};
+        P.paid[S.key]=true; saveP();
+      }
+    }
+    saveRound();
+  }
+
+  function finish(){
+    show("final"); renderWallet();
+    const total=S.res.reduce((s,r)=>s+r.shots,0), tp=total-PAR*HOLES;
+    $("finalLabel").textContent = S.practice ? "Practice round" : `Course #${dayIndex(S.key)+1} · ${new Date(S.key+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}`;
+    const cell=i=>`<td><span class="mk s${S.res[i].shots}">${S.res[i].shots}</span></td>`;
+    $("scorecard").innerHTML=`<tr><th>Hole</th>${S.course.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr><tr><td>Par</td>${S.course.map(()=>`<td>${PAR}</td>`).join("")}</tr><tr><td>Score</td>${S.course.map((_,i)=>cell(i)).join("")}</tr>`;
+    $("finalTotal").textContent=total; $("finalVs").textContent=toParStr(tp);
+    $("finalVs").style.color=tp<0?"var(--birdie)":tp===0?"var(--par)":"var(--bogey)";
+    $("verdict").textContent = tp<=-12?"Tour-winning round.":tp<=-6?"Leading the clubhouse.":tp<0?"Under par — tidy golf.":tp===0?"Level par. Solid.":tp<=6?"A few dropped shots.":"Tough day on the links.";
+    const e=S.earned;
+    $("earn").classList.toggle("hidden",!e);
+    if(e) $("earn").innerHTML=`<div class="ln"><span class="tot">+${e.total} coins</span><span>🔥 ${P.streak}-day streak</span></div>`+
+      e.lines.map(l=>`<div class="ln"><span>${l[0]}</span><span>+${l[1]}</span></div>`).join("")+
+      (e.rainUsed?`<div class="ln"><span>🌧️ Rain delay used to save your streak</span><span>×${e.rainUsed}</span></div>`:"");
+    const em={1:"⛳",2:"🦅",3:"🐦",4:"🟩",5:"🟨",6:"🟧",7:"🟥",8:"⬛"};
+    const line=S.res.map(r=>em[r.shots]).join("");
+    const share=`Pin High ${S.practice?"(practice)":"#"+(dayIndex(S.key)+1)} · ${total} (${toParStr(tp)})${S.mullUsed!=null?" 🔄":""}\n${line}${!S.practice&&P.streak>1?`\n🔥 ${P.streak}-day streak`:""}`;
+    $("shareText").textContent=share;
+    $("copyBtn").onclick=async()=>{ try{ await navigator.clipboard.writeText(share); toast("Copied"); }catch(err){ toast("Select the text above to copy"); } };
+    $("replayBtn").classList.toggle("hidden",!TEST_MODE);
+    $("finalCountdown").textContent = S.practice ? "" : countdown();
+    let stars=0;
+    const paint=()=>$("stars").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.n<=stars));
+    $("stars").querySelectorAll("button").forEach(b=>b.onclick=()=>{ stars=+b.dataset.n; paint(); }); paint();
+    $("fbCopy").onclick=async()=>{
+      const msg=`Pin High feedback\n${"★".repeat(stars)}${"☆".repeat(5-stars)}${stars?"":" (no rating)"}\n${share}\n\n${$("fbText").value.trim()||"(no comments)"}`;
+      try{ await navigator.clipboard.writeText(msg); toast("Feedback copied — paste it in a message"); }
+      catch(err){ $("fbNote").textContent="Couldn't copy automatically — screenshot this or copy your comments by hand."; }
+    };
+    $("review").innerHTML=S.course.map((h,i)=>{
+      const d=h.ref, r=S.res[i];
+      const fg=x=>h.type==="R"?(x.given?esc(x.given)+(x.ok?"":" ✗"):"—"):(Number.isFinite(x.given)?fmtNum(x.given,d):"—");
+      const given=(r.first?fg(r.first)+(r.mull?" (OB, mulligan), then ":" (OB), then "):"")+fg(r)+(h.type==="P"?` → ${fmtNum(d.ans,d)}${d.unit?" "+d.unit:""}`:"");
+      return `<li><span class="n">${i+1}</span><span class="q">${esc(d.p)}<small>${given}</small></span><span class="mk s${r.shots}">${r.shots}</span></li>`;
+    }).join("");
+  }
+
+  function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1600); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  $("answerForm").addEventListener("submit",e=>{e.preventDefault(); submit(false);});
+  $("skipBtn").onclick=()=>{ $("answerInput").value=""; submit(false); };
+  $("sugYes").onclick=()=>submit(false,true);
+  $("sugNo").onclick=()=>{ hideSuggest(); const i=$("answerInput"); i.focus(); i.select(); };
+  $("answerInput").addEventListener("input",hideSuggest);
+  $("nextBtn").onclick=next;
+  $("startDaily").onclick=()=>start(false);
+  $("startPractice").onclick=()=>start(true);
+  $("againBtn").onclick=()=>start(true);
+  $("replayBtn").onclick=()=>start(false);
+  $("toHome").onclick=goHome;
+  $("homeLink").onclick=goHome;
+  $("buyMull").onclick=()=>buy("mull");
+  $("buyRain").onclick=()=>buy("rain");
+  $("testCoins").onclick=()=>{ P.coins+=300; saveP(); renderHome(); toast("+300 coins"); };
+  renderHome();
+})();
+</script>
+</body>
+</html>

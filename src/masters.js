@@ -1,0 +1,100 @@
+/* Master datasets. Rows are in rough order of how often people would name them (most famous first).
+   Derived prompts inherit that order, which sets the shot count. */
+
+// [name|aliases, continents (space separated: EU AS AF NA SA OC), capital|aliases]
+const COUNTRIES = [
+["United Kingdom|UK|Britain|Great Britain","EU","London"],
+["United States|USA|US|America|United States of America","NA","Washington, D.C.|Washington|Washington DC"],
+["France","EU","Paris"],["Germany","EU","Berlin"],["Spain","EU","Madrid"],["Italy","EU","Rome|Roma"],
+["China","AS","Beijing|Peking"],["Japan","AS","Tokyo"],["Australia","OC","Canberra"],["Canada","NA","Ottawa"],
+["Brazil","SA","Brasilia"],["India","AS","New Delhi|Delhi"],["Russia","EU AS","Moscow"],["Mexico","NA","Mexico City"],
+["Ireland|Republic of Ireland|Eire","EU","Dublin"],["England","EU","London"],["Scotland","EU","Edinburgh"],["Wales","EU","Cardiff"],
+["Argentina","SA","Buenos Aires"],["Egypt","AF","Cairo"],["South Africa","AF","Pretoria|Cape Town|Bloemfontein"],
+["Portugal","EU","Lisbon|Lisboa"],["Netherlands|Holland","EU","Amsterdam"],["Greece","EU","Athens|Athina"],
+["Sweden","EU","Stockholm"],["Norway","EU","Oslo"],["Switzerland","EU","Bern|Berne"],["Belgium","EU","Brussels|Bruxelles"],
+["Poland","EU","Warsaw|Warszawa"],["Turkey|Turkiye","EU AS","Ankara"],["New Zealand","OC","Wellington"],
+["South Korea|Korea|Republic of Korea","AS","Seoul"],["North Korea|DPRK","AS","Pyongyang"],["Thailand","AS","Bangkok"],
+["Denmark","EU","Copenhagen|Kobenhavn"],["Finland","EU","Helsinki"],["Austria","EU","Vienna|Wien"],["Iceland","EU","Reykjavik"],
+["Northern Ireland","EU","Belfast"],["Nigeria","AF","Abuja"],["Kenya","AF","Nairobi"],["Jamaica","NA","Kingston"],["Cuba","NA","Havana"],
+["Israel","AS","Jerusalem"],["Saudi Arabia","AS","Riyadh"],["Iran","AS","Tehran"],["Iraq","AS","Baghdad"],["Pakistan","AS","Islamabad"],
+["Afghanistan","AS","Kabul"],["Indonesia","AS","Jakarta|Nusantara"],["Philippines","AS","Manila"],["Vietnam|Viet Nam","AS","Hanoi"],
+["Ukraine","EU","Kyiv|Kiev"],["Colombia","SA","Bogota"],["Peru","SA","Lima"],["Chile","SA","Santiago"],["Morocco","AF","Rabat"],
+["Ghana","AF","Accra"],["Ethiopia","AF","Addis Ababa"],["Czech Republic|Czechia","EU","Prague|Praha"],["Hungary","EU","Budapest"],
+["Croatia","EU","Zagreb"],["Singapore","AS","Singapore"],["Malaysia","AS","Kuala Lumpur|Putrajaya"],
+["United Arab Emirates|UAE","AS","Abu Dhabi"],["Qatar","AS","Doha"],["Venezuela","SA","Caracas"],["Uruguay","SA","Montevideo"],
+["Romania","EU","Bucharest"],["Bulgaria","EU","Sofia"],["Serbia","EU","Belgrade"],["Algeria","AF","Algiers"],["Tunisia","AF","Tunis"],
+["Libya","AF","Tripoli"],["Syria","AS","Damascus"],["Lebanon","AS","Beirut"],["Jordan","AS","Amman"],["Nepal","AS","Kathmandu"],
+["Bangladesh","AS","Dhaka"],["Sri Lanka","AS","Sri Jayawardenepura Kotte|Kotte|Colombo"],["Mongolia","AS","Ulaanbaatar|Ulan Bator"],
+["Taiwan","AS","Taipei"],["Ecuador","SA","Quito"],["Bolivia","SA","Sucre|La Paz"],["Paraguay","SA","Asuncion"],
+["Zimbabwe","AF","Harare"],["Uganda","AF","Kampala"],["Tanzania","AF","Dodoma"],["Cameroon","AF","Yaounde"],["Senegal","AF","Dakar"],
+["Madagascar","AF","Antananarivo"],["Somalia","AF","Mogadishu"],["Sudan","AF","Khartoum"],["Rwanda","AF","Kigali"],
+["Luxembourg","EU","Luxembourg|Luxembourg City"],["Monaco","EU","Monaco|Monaco-Ville"],["Vatican City|Vatican|Holy See","EU","Vatican City|Vatican"],
+["Malta","EU","Valletta"],["Cyprus","EU AS","Nicosia"],["Estonia","EU","Tallinn"],["Latvia","EU","Riga"],["Lithuania","EU","Vilnius"],
+["Slovakia","EU","Bratislava"],["Slovenia","EU","Ljubljana"],["Belarus","EU","Minsk"],["Albania","EU","Tirana"],
+["Bosnia and Herzegovina|Bosnia","EU","Sarajevo"],["Montenegro","EU","Podgorica"],["North Macedonia|Macedonia","EU","Skopje"],
+["Moldova","EU","Chisinau"],["Kosovo","EU","Pristina|Prishtina"],["San Marino","EU","San Marino"],["Andorra","EU","Andorra la Vella"],
+["Liechtenstein","EU","Vaduz"],["Georgia","EU AS","Tbilisi"],["Armenia","EU AS","Yerevan"],["Azerbaijan","EU AS","Baku"],
+["Kazakhstan","AS EU","Astana|Nur-Sultan"],["Uzbekistan","AS","Tashkent"],["Turkmenistan","AS","Ashgabat"],["Kyrgyzstan","AS","Bishkek"],
+["Tajikistan","AS","Dushanbe"],["Myanmar|Burma","AS","Naypyidaw|Nay Pyi Taw"],["Cambodia","AS","Phnom Penh"],["Laos","AS","Vientiane"],
+["Bhutan","AS","Thimphu"],["Maldives","AS","Male"],["Brunei","AS","Bandar Seri Begawan"],["East Timor|Timor-Leste","AS","Dili"],
+["Kuwait","AS","Kuwait City"],["Bahrain","AS","Manama"],["Oman","AS","Muscat"],["Yemen","AS","Sanaa"],["Palestine","AS","Ramallah|East Jerusalem"],
+["Panama","NA","Panama City"],["Costa Rica","NA","San Jose"],["Guatemala","NA","Guatemala City"],["Honduras","NA","Tegucigalpa"],
+["El Salvador","NA","San Salvador"],["Nicaragua","NA","Managua"],["Belize","NA","Belmopan"],["Bahamas|The Bahamas","NA","Nassau"],
+["Barbados","NA","Bridgetown"],["Haiti","NA","Port-au-Prince"],["Dominican Republic","NA","Santo Domingo"],
+["Trinidad and Tobago","NA","Port of Spain"],["Grenada","NA","St. George's|Saint George's"],["Saint Lucia|St Lucia","NA","Castries"],
+["Antigua and Barbuda|Antigua","NA","St. John's|Saint John's"],["Dominica","NA","Roseau"],
+["Saint Vincent and the Grenadines|St Vincent and the Grenadines|St Vincent","NA","Kingstown"],
+["Saint Kitts and Nevis|St Kitts and Nevis|St Kitts","NA","Basseterre"],["Guyana","SA","Georgetown"],["Suriname","SA","Paramaribo"],
+["Fiji","OC","Suva"],["Papua New Guinea|PNG","OC","Port Moresby"],["Samoa","OC","Apia"],["Tonga","OC","Nuku'alofa"],
+["Vanuatu","OC","Port Vila"],["Solomon Islands","OC","Honiara"],["Kiribati","OC","Tarawa|South Tarawa"],
+["Micronesia|Federated States of Micronesia","OC","Palikir"],["Marshall Islands","OC","Majuro"],["Palau","OC","Ngerulmud"],
+["Tuvalu","OC","Funafuti"],["Nauru","OC","Yaren"],
+["Ivory Coast|Cote d'Ivoire","AF","Yamoussoukro"],["Democratic Republic of the Congo|DR Congo|DRC|Congo DR|Zaire","AF","Kinshasa"],
+["Republic of the Congo|Congo|Congo-Brazzaville","AF","Brazzaville"],["Zambia","AF","Lusaka"],["Angola","AF","Luanda"],
+["Mozambique","AF","Maputo"],["Botswana","AF","Gaborone"],["Namibia","AF","Windhoek"],["Mali","AF","Bamako"],["Niger","AF","Niamey"],
+["Chad","AF","N'Djamena"],["Sierra Leone","AF","Freetown"],["Liberia","AF","Monrovia"],["Malawi","AF","Lilongwe"],
+["South Sudan","AF","Juba"],["Gambia|The Gambia","AF","Banjul"],["Eritrea","AF","Asmara"],["Burkina Faso","AF","Ouagadougou"],
+["Benin","AF","Porto-Novo"],["Togo","AF","Lome"],["Guinea","AF","Conakry"],["Mauritius","AF","Port Louis"],["Seychelles","AF","Victoria"],
+["Lesotho","AF","Maseru"],["Eswatini|Swaziland","AF","Mbabane|Lobamba"],["Gabon","AF","Libreville"],["Burundi","AF","Gitega|Bujumbura"],
+["Djibouti","AF","Djibouti"],["Mauritania","AF","Nouakchott"],["Central African Republic|CAR","AF","Bangui"],
+["Cape Verde|Cabo Verde","AF","Praia"],["Equatorial Guinea","AF","Malabo"],["Guinea-Bissau|Guinea Bissau","AF","Bissau"],
+["Comoros","AF","Moroni"],["Sao Tome and Principe|Sao Tome","AF","Sao Tome"]
+];
+
+// [name|aliases, symbol] in fame order
+const ELEMENTS = [
+["Oxygen","O"],["Hydrogen","H"],["Carbon","C"],["Gold","Au"],["Iron","Fe"],["Nitrogen","N"],["Helium","He"],["Silver","Ag"],
+["Copper","Cu"],["Sodium","Na"],["Calcium","Ca"],["Chlorine","Cl"],["Uranium","U"],["Lead","Pb"],["Aluminium|Aluminum","Al"],
+["Zinc","Zn"],["Potassium","K"],["Magnesium","Mg"],["Neon","Ne"],["Mercury","Hg"],["Lithium","Li"],["Platinum","Pt"],
+["Sulfur|Sulphur","S"],["Silicon","Si"],["Plutonium","Pu"],["Tin","Sn"],["Nickel","Ni"],["Phosphorus","P"],["Fluorine","F"],
+["Argon","Ar"],["Titanium","Ti"],["Iodine","I"],["Radium","Ra"],["Cobalt","Co"],["Chromium","Cr"],["Tungsten","W"],["Boron","B"],
+["Krypton","Kr"],["Xenon","Xe"],["Radon","Rn"],["Beryllium","Be"],["Manganese","Mn"],["Arsenic","As"],["Bromine","Br"],
+["Barium","Ba"],["Caesium|Cesium","Cs"],["Strontium","Sr"],["Bismuth","Bi"],["Cadmium","Cd"],["Palladium","Pd"],["Antimony","Sb"],
+["Selenium","Se"],["Polonium","Po"],["Vanadium","V"],["Gallium","Ga"],["Germanium","Ge"],["Zirconium","Zr"],["Molybdenum","Mo"],
+["Iridium","Ir"],["Osmium","Os"],["Thorium","Th"],["Francium","Fr"],["Rubidium","Rb"],["Scandium","Sc"],["Yttrium","Y"],
+["Neodymium","Nd"],["Tellurium","Te"],["Indium","In"],["Tantalum","Ta"],["Rhodium","Rh"],["Ruthenium","Ru"],["Niobium","Nb"],
+["Hafnium","Hf"],["Rhenium","Re"],["Thallium","Tl"],["Astatine","At"],["Actinium","Ac"],["Protactinium","Pa"],["Neptunium","Np"],
+["Americium","Am"],["Curium","Cm"],["Berkelium","Bk"],["Californium","Cf"],["Einsteinium","Es"],["Fermium","Fm"],
+["Mendelevium","Md"],["Nobelium","No"],["Lawrencium","Lr"],["Rutherfordium","Rf"],["Dubnium","Db"],["Seaborgium","Sg"],
+["Bohrium","Bh"],["Hassium","Hs"],["Meitnerium","Mt"],["Darmstadtium","Ds"],["Roentgenium","Rg"],["Copernicium","Cn"],
+["Nihonium","Nh"],["Flerovium","Fl"],["Moscovium","Mc"],["Livermorium","Lv"],["Tennessine","Ts"],["Oganesson","Og"],
+["Lanthanum","La"],["Cerium","Ce"],["Praseodymium","Pr"],["Promethium","Pm"],["Samarium","Sm"],["Europium","Eu"],
+["Gadolinium","Gd"],["Terbium","Tb"],["Dysprosium","Dy"],["Holmium","Ho"],["Erbium","Er"],["Thulium","Tm"],["Ytterbium","Yb"],
+["Lutetium","Lu"],["Technetium","Tc"]
+];
+
+// [state, capital] in state-fame order
+const STATES = [
+["California","Sacramento"],["Texas","Austin"],["Florida","Tallahassee"],["New York","Albany"],["Alaska","Juneau"],["Hawaii","Honolulu"],
+["Washington","Olympia"],["Nevada","Carson City"],["Arizona","Phoenix"],["Colorado","Denver"],["Ohio","Columbus"],["Georgia","Atlanta"],
+["Michigan","Lansing"],["Illinois","Springfield"],["Oregon","Salem"],["Utah","Salt Lake City"],["Massachusetts","Boston"],
+["New Jersey","Trenton"],["Pennsylvania","Harrisburg"],["Virginia","Richmond"],["Tennessee","Nashville"],["Louisiana","Baton Rouge"],
+["Kentucky","Frankfort"],["Montana","Helena"],["Alabama","Montgomery"],["North Carolina","Raleigh"],["South Carolina","Columbia"],
+["Mississippi","Jackson"],["Missouri","Jefferson City"],["Minnesota","Saint Paul|St Paul"],["Wisconsin","Madison"],
+["Indiana","Indianapolis"],["Iowa","Des Moines"],["Kansas","Topeka"],["Oklahoma","Oklahoma City"],["Arkansas","Little Rock"],
+["Nebraska","Lincoln"],["Idaho","Boise"],["Wyoming","Cheyenne"],["New Mexico","Santa Fe"],["Maine","Augusta"],["Vermont","Montpelier"],
+["New Hampshire","Concord"],["Connecticut","Hartford"],["Rhode Island","Providence"],["Maryland","Annapolis"],["Delaware","Dover"],
+["West Virginia","Charleston"],["North Dakota","Bismarck"],["South Dakota","Pierre"]
+];
+// capitals in rough fame order (for the capitals prompt)
+const STATE_CAPITAL_FAME = ["Boston","Atlanta","Honolulu","Austin","Sacramento","Denver","Phoenix","Nashville","Salt Lake City","Indianapolis","Columbus","Oklahoma City","Albany","Tallahassee","Baton Rouge","Richmond","Little Rock","Santa Fe","Juneau","Carson City","Olympia","Springfield","Raleigh","Providence","Madison","Des Moines","Saint Paul","Jackson","Montgomery","Columbia","Lincoln","Charleston","Hartford","Annapolis","Harrisburg","Trenton","Boise","Cheyenne","Helena","Lansing","Topeka","Dover","Frankfort","Jefferson City","Bismarck","Concord","Augusta","Montpelier","Pierre","Salem"];

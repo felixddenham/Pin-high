@@ -685,6 +685,70 @@ const PINS = [
 ["What is the boiling point of water in kelvin, roughly?",373,"K","c"]
 ].filter(q=>q[3]!=="skip");
 
+/* Fixed course calendar: date -> 9 prompt ids in hole order (R P R R P R R P R).
+   NEVER edit past or current dates. Append new dates with tools/extend_schedule.js. */
+const SCHEDULE = {"2026-11-06":["shakespeare","pin23","c-NA","six-nations","pin186","capl-P","el-S","pin159","us-N"],
+"2026-11-07":["norse-gods","pin73","cl-L","london-airports","pin154","open-winners","capl-S","pin150","odd-symbols"],
+"2026-11-08":["coffee","pin204","snooker-champs","aus-states","pin205","pl-clubs","london-boroughs","pin206","full-english"],
+"2026-11-09":["cap-AM","pin160","el-any","olympic-hosts","pin22","constellations","sherlock","pin161","polygons"],
+"2026-11-10":["f1-champs","pin2","roman-gods","scottish-cities","pin140","el-1","swim-strokes","pin141","canada-provinces"],
+"2026-11-11":["us-M","pin8","uk-pms","cl-P","pin9","test-cricket","c-AS","pin0","golf-clubs"],
+"2026-11-12":["capl-B","pin78","england-managers","el-ium","pin79","c-EU","nobel","pin69","chinese-zodiac"],
+"2026-11-13":["bond-actors","pin110","bond-films","national-parks","pin111","welsh-cities","poker","pin112","doctor-who"],
+"2026-11-14":["el-B","pin83","us-2","friends","pin82","pixar","moonwalkers","pin81","c-AF"],
+"2026-11-15":["dog-groups","pin143","c-ia","teeth","pin142","tube-lines","star-wars","pin145","beatles"],
+"2026-11-16":["capl-M","pin3","lloyd-webber","greek-letters","pin1","atmosphere","germany-borders","pin7","golf-majors"],
+"2026-11-17":["monopoly","pin67","el-N","cl-T","pin77","queen-band","france-borders","pin47","open-venues"],
+"2026-11-18":["us-presidents","pin207","cap-EU","take-that","pin203","austen","china-borders","pin202","scottish-champs"],
+"2026-11-19":["harry-potter","pin130","vitamins","cluedo","pin131","seven-wonders","platonic","pin132","eu-members"],
+"2026-11-20":["cap-OC","pin4","zodiac","clouds","pin5","el-C","strictly","pin6","one-direction"],
+"2026-11-21":["us-any","pin136","c-SA","cap-AF","pin196","russell-group","spice-girls","pin195","nato"],
+"2026-11-22":["golf-scores","pin200","apes","metric-prefixes","pin201","g7","us-cap","pin51","cl-G"],
+"2026-11-23":["planets","pin184","wc-winners","wc-hosts","pin135","cap-AS","orchestra","pin185","dickens"],
+"2026-11-24":["noble-gases","pin123","english-counties","c-OC","pin122","si-units","greek-gods","pin121","henry-wives"],
+"2026-11-25":["cl-S","pin171","mcu","christie","pin170","monarchs-1714","c-land","pin173","simpsons"],
+"2026-11-26":["tudors","pin20","cl-C","unsc","pin21","dwarfs","six-nations","pin91","shakespeare"],
+"2026-11-27":["cl-N","pin56","el-S","capl-P","pin57","c-NA","us-N","pin54","open-winners"],
+"2026-11-28":["cl-A","pin115","capl-S","norse-gods","pin101","london-airports","odd-symbols","pin164","london-boroughs"],
+"2026-11-29":["cl-B","pin25","aus-states","full-english","pin55","snooker-champs","coffee","pin24","pl-clubs"],
+"2026-11-30":["cl-I","pin190","olympic-hosts","cap-AM","pin193","constellations","polygons","pin192","el-any"],
+"2026-12-01":["cl-M","pin176","sherlock","scottish-cities","pin177","roman-gods","el-1","pin174","f1-champs"],
+"2026-12-02":["cl-L","pin59","canada-provinces","swim-strokes","pin49","uk-pms","golf-clubs","pin48","us-M"],
+"2026-12-03":["cl-P","pin88","test-cricket","c-AS","pin71","el-ium","chinese-zodiac","pin89","capl-B"],
+"2026-12-04":["nobel","pin129","c-EU","england-managers","pin175","bond-films","doctor-who","pin182","welsh-cities"],
+"2026-12-05":["bond-actors","pin133","poker","national-parks","pin109","us-2","pixar","pin189","moonwalkers"],
+"2026-12-06":["c-AF","pin68","el-B","friends","pin98","c-ia","dog-groups","pin99","tube-lines"],
+"2026-12-07":["star-wars","pin80","beatles","teeth","pin93","atmosphere","capl-M","pin84","golf-majors"],
+"2026-12-08":["germany-borders","pin126","greek-letters","lloyd-webber","pin138","queen-band","cl-T","pin157","monopoly"],
+"2026-12-09":["open-venues","pin95","france-borders","el-N","pin86","austen","take-that","pin94","scottish-champs"],
+"2026-12-10":["china-borders","pin65","us-presidents","cap-EU","pin62","harry-potter","cluedo","pin63","seven-wonders"],
+"2026-12-11":["eu-members","pin191","vitamins","platonic","pin197","one-direction","cap-OC","pin108","el-C"],
+"2026-12-12":["clouds","pin46","strictly","zodiac","pin44","cap-AF","nato","pin45","spice-girls"],
+"2026-12-13":["russell-group","pin168","us-any","c-SA","pin169","metric-prefixes","golf-scores","pin179","apes"],
+"2026-12-14":["us-cap","pin100","cl-G","g7","pin103","cap-AS","orchestra","pin102","planets"],
+"2026-12-15":["wc-winners","pin58","wc-hosts","dickens","pin50","henry-wives","si-units","pin29","noble-gases"],
+"2026-12-16":["greek-gods","pin10","c-OC","english-counties","pin13","christie","monarchs-1714","pin12","mcu"],
+"2026-12-17":["cl-S","pin117","simpsons","c-land","pin37","tudors","dwarfs","pin116","shakespeare"],
+"2026-12-18":["unsc","pin70","cl-C","six-nations","pin72","capl-P","open-winners","pin75","el-S"],
+"2026-12-19":["c-NA","pin36","us-N","cl-N","pin34","odd-symbols","capl-S","pin35","norse-gods"],
+"2026-12-20":["london-boroughs","pin187","cl-A","london-airports","pin180","full-english","coffee","pin181","pl-clubs"],
+"2026-12-21":["aus-states","pin152","cl-B","snooker-champs","pin153","polygons","olympic-hosts","pin183","constellations"],
+"2026-12-22":["cap-AM","pin74","cl-I","el-any","pin11","roman-gods","sherlock","pin76","f1-champs"],
+"2026-12-23":["scottish-cities","pin42","el-1","cl-M","pin90","swim-strokes","golf-clubs","pin43","us-M"],
+"2026-12-24":["cl-L","pin113","uk-pms","canada-provinces","pin104","capl-B","chinese-zodiac","pin32","test-cricket"],
+"2026-12-25":["reindeer","pin172","c-AS","el-ium","pin105","cl-P","england-managers","pin40","bond-films"],
+"2026-12-26":["c-EU","pin30","nobel","welsh-cities","pin31","doctor-who","national-parks","pin52","bond-actors"],
+"2026-12-27":["pixar","pin107","us-2","poker","pin158","moonwalkers","c-AF","pin106","friends"],
+"2026-12-28":["dog-groups","pin151","el-B","c-ia","pin166","tube-lines","star-wars","pin167","capl-M"],
+"2026-12-29":["golf-majors","pin137","beatles","atmosphere","pin147","teeth","germany-borders","pin146","greek-letters"],
+"2026-12-30":["queen-band","pin39","lloyd-webber","monopoly","pin38","cl-T","open-venues","pin163","scottish-champs"],
+"2026-12-31":["el-N","pin128","austen","france-borders","pin124","take-that","us-presidents","pin155","cap-EU"],
+"2027-01-01":["china-borders","pin61","cluedo","seven-wonders","pin60","harry-potter","el-C","pin66","vitamins"],
+"2027-01-02":["eu-members","pin148","platonic","cap-OC","pin118","one-direction","zodiac","pin198","nato"],
+"2027-01-03":["clouds","pin41","strictly","spice-girls","pin18","cap-AF","apes","pin19","golf-scores"],
+"2027-01-04":["c-SA","pin53","russell-group","metric-prefixes","pin26","us-any","planets","pin87","cl-G"],
+"2027-01-05":["g7","pin85","orchestra","us-cap","pin96","cap-AS","henry-wives","pin97","si-units"]};
+
 
 /* =========================================================
    SETTINGS
@@ -811,7 +875,17 @@ function seasonOrder(){
   return {rare:order, pins:shuffled(PIN_POOL,r)};
 }
 const SEASON = seasonOrder();
+// Fixed calendar (src/schedule.js) wins; dates beyond it fall back to the season rotation.
+const BY_ID = Object.fromEntries([...RARE_ALL,...PIN_ALL].map(x=>[x.id,x]));
 function courseFor(key){
+  const ids = (typeof SCHEDULE!=="undefined") && SCHEDULE[key];
+  if(ids && ids.every(id=>BY_ID[id])){
+    const r=rng(hashStr("layout"+key));
+    return ids.map((id,i)=>({type:LAYOUT[i], ref:BY_ID[id], layout:{a:r(),b:r(),c:r(),d:r()}}));
+  }
+  return courseForAlgo(key);
+}
+function courseForAlgo(key){
   const n=Math.max(0,dayIndex(key)), R=SEASON.rare.length, P=SEASON.pins.length, r=rng(hashStr("layout"+key));
   let ri=n*6, pi=n*3;
   const holes=LAYOUT.map(t=> t==="R" ? {type:"R", ref:SEASON.rare[(ri++)%R]} : {type:"P", ref:SEASON.pins[(pi++)%P]});
@@ -844,7 +918,7 @@ function coinsFor(res, streak){
   return {lines,total:lines.reduce((s,l)=>s+l[1],0)};
 }
 
-if (typeof module!=="undefined") module.exports={RARE_ALL,PIN_ALL,SEASON,courseFor,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
+if (typeof module!=="undefined") module.exports={RARE_ALL,PIN_ALL,RARE_POOL,PIN_POOL,LAYOUT,BY_ID,SCHEDULE:(typeof SCHEDULE!=="undefined"?SCHEDULE:{}),SEASON,courseFor,courseForAlgo,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
 
 /* =========================================================
    UI
