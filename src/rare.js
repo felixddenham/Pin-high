@@ -90,5 +90,7 @@ const HAND = [
 ["swim-strokes","Name a competitive swimming stroke","Freestyle|Front crawl|Crawl;Breaststroke;Backstroke;Butterfly;Individual medley|Medley"],
 ["dog-groups","Name one of the UK Kennel Club's seven breed groups","Gundog;Terrier;Hound;Toy;Working;Pastoral;Utility"],
 ["teeth","Name a type of human tooth","Molar;Incisor;Canine;Wisdom tooth;Premolar"],
-["sherlock","Name a character from the Sherlock Holmes stories","Sherlock Holmes|Holmes|Sherlock;Dr Watson|John Watson|Watson;Moriarty|Professor Moriarty;Mrs Hudson|Hudson;Mycroft Holmes|Mycroft;Inspector Lestrade|Lestrade;Irene Adler|Adler;Mary Morstan;Colonel Moran|Sebastian Moran;Toby;Wiggins"]
+["sherlock","Name a character from the Sherlock Holmes stories","Sherlock Holmes|Holmes|Sherlock;Dr Watson|John Watson|Watson;Moriarty|Professor Moriarty;Mrs Hudson|Hudson;Mycroft Holmes|Mycroft;Inspector Lestrade|Lestrade;Irene Adler|Adler;Mary Morstan;Colonel Moran|Sebastian Moran;Toby;Wiggins"],
+["wimbledon-men","Name a Wimbledon men's singles champion between 2000 and 2025","Roger Federer|Federer;Andy Murray|Murray;Novak Djokovic|Djokovic;Rafael Nadal|Rafa Nadal|Nadal;Carlos Alcaraz|Alcaraz;Jannik Sinner|Sinner;Pete Sampras|Sampras;Lleyton Hewitt|Hewitt;Goran Ivanisevic|Ivanisevic"],
+["bronte-novels","Name a novel by one of the Brontë sisters","Wuthering Heights;Jane Eyre;The Tenant of Wildfell Hall|Tenant of Wildfell Hall;Agnes Grey;Villette;Shirley;The Professor"]
 ];

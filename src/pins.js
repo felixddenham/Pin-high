@@ -213,5 +213,8 @@ const PINS = [
 ["How far is it from London to Edinburgh as the crow flies, in miles?",332,"miles","r"],
 ["What is the speed limit on a UK motorway, in mph?",70,"mph","c"],
 ["How many degrees are in the interior angles of a hexagon, added together?",720,"degrees","c"],
-["What is the boiling point of water in kelvin, roughly?",373,"K","c"]
+["What is the boiling point of water in kelvin, roughly?",373,"K","c"],
+["In what year did Cadbury launch its Dairy Milk bar?",1905,"","y"],
+["In what year was the first Ryder Cup played?",1927,"","y"],
+["How tall is Scafell Pike, England's highest mountain, in metres?",978,"m","r"]
 ].filter(q=>q[3]!=="skip");
