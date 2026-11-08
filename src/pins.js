@@ -216,5 +216,8 @@ const PINS = [
 ["What is the boiling point of water in kelvin, roughly?",373,"K","c"],
 ["In what year did Cadbury launch its Dairy Milk bar?",1905,"","y"],
 ["In what year was the first Ryder Cup played?",1927,"","y"],
-["How tall is Scafell Pike, England's highest mountain, in metres?",978,"m","r"]
+["How tall is Scafell Pike, England's highest mountain, in metres?",978,"m","r"],
+["How many coloured stickers are on a standard 3x3 Rubik's Cube?",54,"stickers","c"],
+["How tall is the London Eye, in metres?",135,"m","r"],
+["In what year was the first Harry Potter film released?",2001,"","y"]
 ].filter(q=>q[3]!=="skip");
