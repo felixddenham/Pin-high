@@ -16,6 +16,17 @@ Owner: Felix. The game is one static page; `index.html` is BUILT from `src/` —
 - `tools/extend_schedule.js` — rebuilds the calendar from 2+ days ahead, preferring never-used questions.
 - `tools/check.js` — validation; must pass before any push.
 
+## Difficulty: Krillion-style (most important)
+Every prompt must be something ANY adult can answer: they should be able to name 2–3 answers instantly
+(e.g. "Name a fruit", "Name a dog breed", "Name a takeaway dish", "Name a country in Europe").
+The skill is in going niche: obvious answers are a bogey, obscure-but-correct ones are birdies and eagles.
+- Big, open-but-listable categories with LONG answer lists (40–120 answers) are ideal.
+- Avoid specialist categories most people can't start (sports champions lists, literary bibliographies, SI units,
+  cloud types, specific mountains). If a typical person would say "no idea", don't use it.
+- Closest-to-the-pin questions should be fun to estimate for anyone (famous years, everyday numbers, well-known
+  heights/distances), not specialist facts. Felix flagged snooker champions, Brontë novels and Scafell Pike as too niche.
+- Retire a prompt that turns out too niche by adding its id to `RETIRED` at the bottom of `src/rare.js` (never delete it).
+
 ## Hard rules
 - NEVER change today's or tomorrow's course (UK time) or any past date in `src/schedule.js`. Players share results by course number.
 - Prompt ids must be unique and stable. Don't rename or delete existing prompts; you can fix answers.
@@ -27,7 +38,7 @@ Owner: Felix. The game is one static page; `index.html` is BUILT from `src/` —
 
 ## Daily routine (scheduled job)
 1. `python3 build.py && node tools/check.js` — confirm the repo is healthy first.
-2. Write new content: append 2 new rare-find prompts to `HAND` in `src/rare.js` and 3 new questions to the end of `PINS` in
+2. Write new content (Krillion-style difficulty, see above): append 2 new rare-find prompts to `HAND` in `src/rare.js` and 3 new questions to the end of `PINS` in
    `src/pins.js`. Read both files first so nothing duplicates an existing prompt or question. Use new unique ids. Assign a
    family where it clearly overlaps an existing group (see `famOf` in `src/body.html`).
 3. `python3 build.py && node tools/extend_schedule.js --ahead 60 && python3 build.py && node tools/check.js`

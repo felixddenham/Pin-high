@@ -13,11 +13,13 @@ const dates=Object.keys(S).sort();
 let last=G.addDays(from,-1);
 const N=G.dayIndex(todayUK)+ahead-G.dayIndex(last);
 const lastUse={}; dates.forEach((d,i)=>S[d].forEach(id=>lastUse[id]=G.dayIndex(d)));
+// newest questions (added last) go first among never-used ones
+const order={}; [...G.RARE_ALL,...G.PIN_ALL].forEach((x,i)=>order[x.id]=i);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 function pick(pool,day,count,gaps,famCheck,key){
   for(const gap of gaps){
     const cands=pool.filter(x=>lastUse[x.id]==null||day-lastUse[x.id]>=gap)
-      .sort((a,b)=>((lastUse[a.id]??-1e9)-(lastUse[b.id]??-1e9))||(hash(key+a.id)-hash(key+b.id)));
+      .sort((a,b)=>((lastUse[a.id]??-1e9)-(lastUse[b.id]??-1e9))||((lastUse[a.id]==null&&lastUse[b.id]==null)?(order[b.id]-order[a.id]):0)||(hash(key+a.id)-hash(key+b.id)));
     const out=[], fams=new Set();
     for(const c of cands){ if(famCheck&&fams.has(c.fam)) continue; out.push(c); fams.add(c.fam); if(out.length===count) return out; }
   }

@@ -194,7 +194,7 @@ function buildRare(){
   const famOf={g7:"country",unsc:"country",eu_members:"country","eu-members":"country","germany-borders":"country","france-borders":"country","china-borders":"country","olympic-hosts":"country","wc-hosts":"country",
     "noble-gases":"element","odd-symbols":"element","planets":"space","constellations":"space","beatles":"band","spice-girls":"band","one-direction":"band","take-that":"band","queen-band":"band",
     "golf-clubs":"golf","golf-scores":"golf","open-venues":"golf","golf-majors":"golf","open-winners":"golf","greek-gods":"myth","roman-gods":"myth","norse-gods":"myth",
-    "tudors":"royals","monarchs-1714":"royals","henry-wives":"royals","scottish-cities":"ukplaces","welsh-cities":"ukplaces","zodiac":"zodiac","chinese-zodiac":"zodiac"};
+    "tudors":"royals","monarchs-1714":"royals","henry-wives":"royals","scottish-cities":"ukplaces","welsh-cities":"ukplaces","zodiac":"zodiac","chinese-zodiac":"zodiac","fruit":"food-a","vegetable":"food-a","herb-spice":"food-a","cheese":"food-b","pasta":"food-b","bread":"food-b","takeaway":"food-c","breakfast-cereal":"food-c","chocolate-bar":"food-c","tree":"nature","flower":"nature","superhero":"film","disney-films":"film","pixar":"film","mcu":"film","star-wars":"film"};
   for(const h of HAND){ const [id,p,a,theme]=h; const r={id,p,a:a.split(";"),fam:famOf[id]||id}; if(theme) r.theme=theme; out.push(r); }
   return out;
 }
@@ -259,7 +259,8 @@ function addDays(key,n){ const d=new Date(key+"T12:00:00Z"); d.setUTCDate(d.getU
 function fmtNum(v,q){ if(q && q.fmt==="year") return String(v); return Number(v).toLocaleString("en-GB",{maximumFractionDigits:2}); }
 
 const RARE_ALL = buildRare(), PIN_ALL = buildPins();
-const RARE_POOL = RARE_ALL.filter(r=>!r.theme), PIN_POOL = PIN_ALL;
+const RETIRED_SET = new Set(typeof RETIRED!=="undefined"?RETIRED:[]);
+const RARE_POOL = RARE_ALL.filter(r=>!r.theme && !RETIRED_SET.has(r.id)), PIN_POOL = PIN_ALL.filter(p=>!RETIRED_SET.has(p.id));
 
 // Fixed season order. Rare prompts are ordered so no two from the same family land within 6 slots of each other.
 function seasonOrder(){
