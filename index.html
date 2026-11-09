@@ -6,6 +6,8 @@
 <title>Pin High — daily trivia golf</title>
 <meta name="description" content="Pin High is a free daily trivia golf game. Nine holes, nine general knowledge questions, par 36 — the rarer your answer, the fewer shots it takes. New course every day.">
 <meta name="google-site-verification" content="qNyMgrGdJlrq90-qeBjJWKEqE3wJO0vCpP69_7nUWY0" />
+<!-- Analytics: cookie-free GoatCounter (dashboard: pinhigh.goatcounter.com) -->
+<script data-goatcounter="https://pinhigh.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <link rel="canonical" href="https://pinhighgame.netlify.app/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://pinhighgame.netlify.app/">
@@ -1029,6 +1031,7 @@ if (typeof document!=="undefined") (function(){
     if(!practice && saved && saved.done){ S=hydrate(saved); return finish(); }
     if(!practice && saved && saved.res){ S=hydrate(saved); return playHole(); }
     S={practice, key:todayKey, course: practice?practiceCourse():courseFor(todayKey), idx:0, res:[], done:false, mullUsed:null};
+    track(practice?"practice-start":"round-start");
     playHole();
   }
   // saved rounds store prompt ids; rebuild references
@@ -1198,6 +1201,8 @@ if (typeof document!=="undefined") (function(){
 
   function completeRound(){
     S.done=true; S.earned=null;
+    if(!S.practice){ const tp=runningToPar(); track("round-finish"); track("score-"+(tp<=-6?"-6orbetter":tp<0?"under-par":tp===0?"level":tp<=6?"1-6-over":"7plus-over")); if(P.streak>=1 && nextStreak(P,S.key).streak>1) track("returning-player"); }
+    else track("practice-finish");
     if(!S.practice){
       const firstTime = TEST_MODE || !P.paid[S.key];
       const st=nextStreak(P,S.key);
@@ -1229,7 +1234,7 @@ if (typeof document!=="undefined") (function(){
     const line=S.res.map(r=>em[r.shots]).join("");
     const share=`Pin High ${S.practice?"(practice)":"#"+(dayIndex(S.key)+1)} · ${total} (${toParStr(tp)})${S.mullUsed!=null?" 🔄":""}\n${line}${!S.practice&&P.streak>1?`\n🔥 ${P.streak}-day streak`:""}`;
     $("shareText").textContent=share;
-    $("copyBtn").onclick=async()=>{ try{ await navigator.clipboard.writeText(share); toast("Copied"); }catch(err){ toast("Select the text above to copy"); } };
+    $("copyBtn").onclick=async()=>{ track("share-copied"); try{ await navigator.clipboard.writeText(share); toast("Copied"); }catch(err){ toast("Select the text above to copy"); } };
     $("replayBtn").classList.toggle("hidden",!TEST_MODE);
     $("finalCountdown").textContent = S.practice ? "" : countdown();
     let stars=0;
@@ -1237,7 +1242,7 @@ if (typeof document!=="undefined") (function(){
     $("stars").querySelectorAll("button").forEach(b=>b.onclick=()=>{ stars=+b.dataset.n; paint(); }); paint();
     $("fbCopy").onclick=async()=>{
       const msg=`Pin High feedback\n${"★".repeat(stars)}${"☆".repeat(5-stars)}${stars?"":" (no rating)"}\n${share}\n\n${$("fbText").value.trim()||"(no comments)"}`;
-      try{ await navigator.clipboard.writeText(msg); toast("Feedback copied — paste it in a message"); }
+      track("feedback-copied"); try{ await navigator.clipboard.writeText(msg); toast("Feedback copied — paste it in a message"); }
       catch(err){ $("fbNote").textContent="Couldn't copy automatically — screenshot this or copy your comments by hand."; }
     };
     $("review").innerHTML=S.course.map((h,i)=>{
@@ -1248,6 +1253,8 @@ if (typeof document!=="undefined") (function(){
     }).join("");
   }
 
+  // analytics events (no-op if GoatCounter isn't loaded)
+  function track(name){ try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path:name, title:name, event:true}); }catch(e){} }
   function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1600); }
   function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
