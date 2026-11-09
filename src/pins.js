@@ -219,5 +219,8 @@ const PINS = [
 ["How tall is Scafell Pike, England's highest mountain, in metres?",978,"m","r"],
 ["How many coloured stickers are on a standard 3x3 Rubik's Cube?",54,"stickers","c"],
 ["How tall is the London Eye, in metres?",135,"m","r"],
-["In what year was the first Harry Potter film released?",2001,"","y"]
+["In what year was the first Harry Potter film released?",2001,"","y"],
+["In what year did Elvis Presley die?",1977,"","y"],
+["How many old pennies were in a pound before decimalisation in 1971?",240,"pennies","c"],
+["How many small squares are on a standard Sudoku grid?",81,"squares","c"]
 ].filter(q=>q[3]!=="skip");
