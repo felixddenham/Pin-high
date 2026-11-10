@@ -222,5 +222,8 @@ const PINS = [
 ["In what year was the first Harry Potter film released?",2001,"","y"],
 ["In what year did Elvis Presley die?",1977,"","y"],
 ["How many old pennies were in a pound before decimalisation in 1971?",240,"pennies","c"],
-["How many small squares are on a standard Sudoku grid?",81,"squares","c"]
+["How many small squares are on a standard Sudoku grid?",81,"squares","c"],
+["In what year did England win the men's Rugby World Cup?",2003,"","y"],
+["How many millilitres are in a UK pint, roughly?",568,"ml","r"],
+["Roughly what percentage of the Earth's surface is covered by water?",71,"%",[0,1,3,6,10,20]]
 ].filter(q=>q[3]!=="skip");
