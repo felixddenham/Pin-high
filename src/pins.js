@@ -225,5 +225,8 @@ const PINS = [
 ["How many small squares are on a standard Sudoku grid?",81,"squares","c"],
 ["In what year did England win the men's Rugby World Cup?",2003,"","y"],
 ["How many millilitres are in a UK pint, roughly?",568,"ml","r"],
-["Roughly what percentage of the Earth's surface is covered by water?",71,"%",[0,1,3,6,10,20]]
+["Roughly what percentage of the Earth's surface is covered by water?",71,"%",[0,1,3,6,10,20]],
+["In what year was Queen's 'Bohemian Rhapsody' first released as a single?",1975,"","y"],
+["How many stars are on the flag of the European Union?",12,"stars",[0,1,2,4,6,10]],
+["How long is the M25 London Orbital motorway, in miles?",117,"miles","r"]
 ].filter(q=>q[3]!=="skip");
