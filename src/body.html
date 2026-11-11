@@ -217,23 +217,52 @@ function norm(s){
     .replace(/&/g," and ").replace(/\bpt\b\.?/g,"part")
     .replace(/[’'`.,!?:;()"*\-]/g," ").replace(/^\s*the\s+/,"").replace(/\s+/g," ").trim();
 }
-function lev(a,b){
+// Optimal-string-alignment distance: a swapped pair of letters ("teh") counts as one typo.
+function lev(a,b,max=99){
   if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
-  let prev=Array.from({length:n+1},(_,i)=>i), cur=new Array(n+1);
-  for(let i=1;i<=m;i++){ cur[0]=i; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); [prev,cur]=[cur,prev]; }
+  if(Math.abs(m-n)>max) return max+1;
+  let pp=new Array(n+1).fill(0), prev=Array.from({length:n+1},(_,i)=>i), cur=new Array(n+1);
+  for(let i=1;i<=m;i++){ cur[0]=i; let lo=cur[0];
+    for(let j=1;j<=n;j++){
+      let v=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+      if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) v=Math.min(v,pp[j-2]+1);
+      cur[j]=v; if(v<lo) lo=v; }
+    if(lo>max) return max+1;
+    [pp,prev,cur]=[prev,cur,pp]; }
   return prev[n];
 }
 // "St" can mean Saint or Street: try every reading
 function stForms(k){ return [k, k.replace(/\bst\b/g,"saint"), k.replace(/\bst\b/g,"street"), k.replace(/\bsaint\b/g,"st")]; }
-function rareShots(i,n){ if(i===n-1) return 1; const p=i/n; return p<0.12?5:p<0.32?4:p<0.6?3:p<0.85?2:1; }
+// Short lists score by position; long data-driven lists score on a log scale so only the truly obvious answers are bogeys.
+function rareShots(i,n){
+  if(i===n-1) return 1;
+  if(n>=150){ const p=Math.log(i+1)/Math.log(n); return p<0.3?5:p<0.45?4:p<0.6?3:p<0.82?2:1; }
+  const p=i/n; return p<0.12?5:p<0.32?4:p<0.6?3:p<0.85?2:1;
+}
+// How many typos to forgive for a word of this length.
+function typoAllow(L){ return L<3?0 : L<5?1 : L<8?2 : L<12?3 : 4; }
+const singular=w=>w.replace(/\b(\w{3,}?)(ies)\b/g,"$1y").replace(/\b(\w{3,}?)(es|s)\b/g,"$1");
+const ENTRY_CACHE=new WeakMap();
+function entriesFor(list){
+  let E=ENTRY_CACHE.get(list); if(E) return E;
+  E=list.map((s,i)=>{ const keys=[...new Set(s.split("|").map(norm).flatMap(stForms))];
+    return {i,name:first(s),keys,loose:[...new Set(keys.flatMap(k=>[k.replace(/ /g,""),singular(k).replace(/ /g,"")]))]}; });
+  const exact=new Map(); E.forEach(e=>e.keys.forEach(k=>{ if(!exact.has(k)) exact.set(k,e); }));
+  E.exact=exact; ENTRY_CACHE.set(list,E); return E;
+}
+let KNOWN=null; // every answer in the game, so a real-but-wrong answer (Austria for Oceania) isn't "corrected" to a near neighbour (Australia)
+function knownNames(){ if(!KNOWN){ KNOWN=new Set(); for(const r of RARE_ALL) for(const s of r.a) for(const k of s.split("|")) KNOWN.add(norm(k)); } return KNOWN; }
 function matchRare(input, list){
   const q=norm(input); if(!q) return null;
-  const entries=list.map((s,i)=>({i,name:first(s),keys:[...new Set(s.split("|").map(norm).flatMap(stForms))]}));
-  for(const v of stForms(q)) for(const e of entries) if(e.keys.includes(v)) return {...e, exact:true};
+  const E=entriesFor(list);
+  for(const v of stForms(q)){ const e=E.exact.get(v); if(e) return {...e, exact:true}; }
+  const ql=q.replace(/ /g,""), qs=singular(q).replace(/ /g,"");
+  for(const e of E) if(e.loose.includes(ql)||e.loose.includes(qs)) return {...e, exact:true};
+  if(typeof RARE_ALL!=="undefined" && knownNames().has(q)) return null;
   let best=null,bd=99;
-  for(const e of entries) for(const k of e.keys){
-    const allow = k.length>=10?3 : k.length>=6?2 : k.length>=4?1 : 0; if(!allow) continue;
-    const d=lev(q,k); if(d<=allow && d<bd){bd=d;best=e;}
+  for(const e of E) for(const k of e.loose){
+    const allow=typoAllow(Math.min(ql.length,k.length)); if(!allow) continue;
+    const d=lev(ql,k,Math.min(allow,bd-1)); if(d<=allow && d<bd){bd=d;best=e; if(d===1) break;}
   }
   return best ? {...best, exact:false} : null;
 }
