@@ -26,6 +26,9 @@ The skill is in going niche: obvious answers are a bogey, obscure-but-correct on
   are a double bogey and niche-but-correct ones score well. New hand-written prompts need at least 150 answers (aim 200+),
   so they use the log-scale scoring for long lists (`rareShots` in `src/body.html`). Don't add new closed sets under 40 answers;
   Felix asked for those to be retired once enough big prompts exist to fill the schedule.
+- Open-ended prompts ("Name a superhero", "Name a UK chocolate bar") must be GENEROUS: include sub-brands and variants (Wispa Gold,
+  Dairy Milk Marvellous Creations), discontinued-but-remembered items, and children's/cartoon examples (Captain Underpants).
+  Felix reports any valid answer that scores as a lost ball. When in doubt, accept it (append near the end of the list).
 - Avoid specialist categories most people can't start (sports champions lists, literary bibliographies, SI units,
   cloud types, specific mountains). If a typical person would say "no idea", don't use it.
 - Closest-to-the-pin questions should be fun to estimate for anyone (famous years, everyday numbers, well-known
