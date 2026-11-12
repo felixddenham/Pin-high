@@ -228,5 +228,8 @@ const PINS = [
 ["Roughly what percentage of the Earth's surface is covered by water?",71,"%",[0,1,3,6,10,20]],
 ["In what year was Queen's 'Bohemian Rhapsody' first released as a single?",1975,"","y"],
 ["How many stars are on the flag of the European Union?",12,"stars",[0,1,2,4,6,10]],
-["How long is the M25 London Orbital motorway, in miles?",117,"miles","r"]
+["How long is the M25 London Orbital motorway, in miles?",117,"miles","r"],
+["In what year did the Great Storm hit southern England, the night Michael Fish said no hurricane was on the way?",1987,"","y"],
+["Roughly how many minutes does sunlight take to travel from the Sun to the Earth?",8.3,"minutes","r"],
+["How many dominoes are in a standard double-six set?",28,"dominoes","c"]
 ].filter(q=>q[3]!=="skip");
