@@ -45,7 +45,7 @@
   <section id="home" class="card">
     <div class="tiny" id="homeDate"></div>
     <h1>Pin High</h1>
-    <p class="lede">A daily round of trivia golf. Nine holes, nine questions, par 36. Everyone plays the same course each day.</p>
+    <p class="lede">A daily round of golf trivia. Nine holes, nine golf questions, par 36. Everyone plays the same course each day.</p>
     <div class="stack">
       <button class="btn primary" id="startDaily">Tee off</button>
       <button class="btn ghost" id="startPractice">Practice round</button>
@@ -193,19 +193,19 @@ function buildRare(){
   add("us-2","Name a US state with a two-word name",STATES.filter(s=>s[0].includes(" ")).map(s=>s[0]),"usa");
   const famOf={g7:"country",unsc:"country",eu_members:"country","eu-members":"country","germany-borders":"country","france-borders":"country","china-borders":"country","olympic-hosts":"country","wc-hosts":"country","commonwealth":"country",
     "noble-gases":"element","odd-symbols":"element","planets":"space","constellations":"space","beatles":"band","spice-girls":"band","one-direction":"band","take-that":"band","queen-band":"band",
-    "golf-clubs":"golf","golf-scores":"golf","open-venues":"golf","golf-majors":"golf","open-winners":"golf","greek-gods":"myth","roman-gods":"myth","norse-gods":"myth",
+    "golf-clubs":"golf-kit","golf-scores":"golf-terms","open-venues":"golf","golf-majors":"golf","open-winners":"golf","greek-gods":"myth","roman-gods":"myth","norse-gods":"myth",
     "tudors":"royals","monarchs-1714":"royals","henry-wives":"royals","scottish-cities":"ukplaces","welsh-cities":"ukplaces","english-cities":"ukplaces","zodiac":"zodiac","chinese-zodiac":"zodiac","fruit":"food-a","vegetable":"food-a","herb-spice":"food-a","cheese":"food-b","pasta":"food-b","bread":"food-b","takeaway":"food-c","breakfast-cereal":"food-c","chocolate-bar":"food-c","tree":"nature","flower":"nature","superhero":"film","disney-films":"film","pixar":"film","mcu":"film","star-wars":"film","olympic-sports":"sport","beatles-songs":"band"};
-  for(const h of HAND){ const [id,p,a,theme]=h; const r={id,p,a:a.split(";"),fam:famOf[id]||id}; if(theme) r.theme=theme; out.push(r); }
+  for(const h of HAND){ const [id,p,a,theme]=h; const r={id,p,a:a.split(";"),fam:famOf[id]||(typeof GOLF_FAM!=="undefined"&&GOLF_FAM[id])||id}; if(theme) r.theme=theme; out.push(r); }
   return out;
 }
 function buildPins(){
-  return PINS.map(([p,ans,unit,kind],i)=>{
+  return PINS.map(([p,ans,unit,kind,golf],i)=>{
     let mode="abs", bands, fmt="";
     if(Array.isArray(kind)) bands=kind;
     else if(kind==="y"){ fmt="year"; bands = ans>=1800?[0,1,3,8,20,50] : ans>=1000?[0,3,10,30,75,150] : [0,5,20,50,100,200]; }
     else if(kind==="c"){ const c=x=>Math.max(1,Math.ceil(ans*x)); bands=[0,c(.04),c(.1),c(.25),c(.5),c(1)]; }
     else { mode="rel"; bands=[0.01,0.05,0.12,0.25,0.5,1]; }
-    return {id:"pin"+i,p,ans,unit,mode,bands,fmt};
+    return {id:"pin"+i,p,ans,unit,mode,bands,fmt,golf:golf==="g"};
   });
 }
 
@@ -215,7 +215,8 @@ function buildPins(){
 function norm(s){
   return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
     .replace(/&/g," and ").replace(/\bpt\b\.?/g,"part")
-    .replace(/[’'`.,!?:;()"*\-]/g," ").replace(/^\s*the\s+/,"").replace(/\s+/g," ").trim();
+    .replace(/[’'`.,!?:;()"*\-]/g," ").replace(/^\s*the\s+/,"").replace(/\s+/g," ").trim()
+    .replace(/^(.+?) (golf (and|&) country club|golf club|golf course|golf links|golf resort|gc)$/,"$1");
 }
 // Optimal-string-alignment distance: a swapped pair of letters ("teh") counts as one typo.
 function lev(a,b,max=99){
@@ -289,7 +290,12 @@ function fmtNum(v,q){ if(q && q.fmt==="year") return String(v); return Number(v)
 
 const RARE_ALL = buildRare(), PIN_ALL = buildPins();
 const RETIRED_SET = new Set(typeof RETIRED!=="undefined"?RETIRED:[]);
-const RARE_POOL = RARE_ALL.filter(r=>!r.theme && !RETIRED_SET.has(r.id)), PIN_POOL = PIN_ALL.filter(p=>!RETIRED_SET.has(p.id));
+// Golf-only era (from 2026-11-15): only golf prompts (family "golf-*") and golf pins (5th field "g") are scheduled.
+// Older general-knowledge content stays so past courses still load.
+const GOLF_ONLY = true;
+const isGolfRare = r => /^golf-/.test(r.fam);
+const RARE_POOL = RARE_ALL.filter(r=>!r.theme && !RETIRED_SET.has(r.id) && (!GOLF_ONLY||isGolfRare(r))),
+      PIN_POOL = PIN_ALL.filter(p=>!RETIRED_SET.has(p.id) && (!GOLF_ONLY||p.golf));
 
 // Fixed season order. Rare prompts are ordered so no two from the same family land within 6 slots of each other.
 function seasonOrder(){
@@ -346,7 +352,7 @@ function coinsFor(res, streak){
   return {lines,total:lines.reduce((s,l)=>s+l[1],0)};
 }
 
-if (typeof module!=="undefined") module.exports={RARE_ALL,PIN_ALL,RARE_POOL,PIN_POOL,LAYOUT,BY_ID,SCHEDULE:(typeof SCHEDULE!=="undefined"?SCHEDULE:{}),SEASON,courseFor,courseForAlgo,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
+if (typeof module!=="undefined") module.exports={GOLF_ONLY,isGolfRare,RARE_ALL,PIN_ALL,RARE_POOL,PIN_POOL,LAYOUT,BY_ID,SCHEDULE:(typeof SCHEDULE!=="undefined"?SCHEDULE:{}),SEASON,courseFor,courseForAlgo,norm,lev,rareShots,matchRare,parseNum,pinShots,nextStreak,coinsFor,dayIndex,addDays};
 
 /* =========================================================
    UI

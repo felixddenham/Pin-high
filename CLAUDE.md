@@ -1,4 +1,4 @@
-# Pin High — daily trivia golf
+# Pin High — daily golf trivia
 
 Live site: https://pinhighgame.netlify.app (Netlify auto-deploys every push to `main`).
 Owner: Felix. The game is one static page; `index.html` is BUILT from `src/` — never edit `index.html` by hand.
@@ -18,22 +18,21 @@ Owner: Felix. The game is one static page; `index.html` is BUILT from `src/` —
 - Typo matching (`matchRare` in `src/body.html`) is deliberately forgiving: ~1 typo per 3–4 letters, swapped letters,
   spaces and plurals ignored, with a "did you mean" check. Felix wants near-miss spellings accepted; don't tighten it.
 
-## Difficulty: Krillion-style (most important)
-Every prompt must be something ANY adult can answer: they should be able to name 2–3 answers instantly
-(e.g. "Name a fruit", "Name a dog breed", "Name a takeaway dish", "Name a country in Europe").
-The skill is in going niche: obvious answers are a bogey, obscure-but-correct ones are birdies and eagles.
-- Felix wants Krillion-sized lists: the best prompts have HUNDREDS to THOUSANDS of valid answers, where the obvious ones
-  are a double bogey and niche-but-correct ones score well. New hand-written prompts need at least 150 answers (aim 200+),
-  so they use the log-scale scoring for long lists (`rareShots` in `src/body.html`). Don't add new closed sets under 40 answers;
-  Felix asked for those to be retired once enough big prompts exist to fill the schedule.
-- Open-ended prompts ("Name a superhero", "Name a UK chocolate bar") must be GENEROUS: include sub-brands and variants (Wispa Gold,
-  Dairy Milk Marvellous Creations), discontinued-but-remembered items, and children's/cartoon examples (Captain Underpants).
-  Felix reports any valid answer that scores as a lost ball. When in doubt, accept it (append near the end of the list).
-- Avoid specialist categories most people can't start (sports champions lists, literary bibliographies, SI units,
-  cloud types, specific mountains). If a typical person would say "no idea", don't use it.
-- Closest-to-the-pin questions should be fun to estimate for anyone (famous years, everyday numbers, well-known
-  heights/distances), not specialist facts. Felix flagged snooker champions, Brontë novels and Scafell Pike as too niche.
-- Retire a prompt that turns out too niche by adding its id to `RETIRED` at the bottom of `src/rare.js` (never delete it).
+## GOLF ONLY (from 2026-11-15) — most important
+Felix made Pin High a golf-only trivia game (its USP). Every NEW prompt and pin must be about golf: courses (UK and world),
+players, tournaments, Ryder Cup, clubs and stock lofts/yardages, equipment brands and models, rules, terms, slang, formats.
+The audience is golfers, so golf knowledge is fine — but a keen club golfer should still be able to name 2–3 answers instantly.
+- `GOLF_ONLY` in `src/body.html` limits scheduling to rare prompts whose family starts `golf-` (set in `GOLF_FAM` in `src/rare.js`)
+  and pins whose 5th field is `"g"`. Old general-knowledge content stays in the files so past courses still load.
+- Give each new golf prompt an id starting `g-` and add it to `GOLF_FAM` with an existing sub-family (golf-players, golf-champs,
+  golf-ryder, golf-uk-courses, golf-courses, golf-events, golf-kit, golf-clubs, golf-terms, golf-play) or a new `golf-...` one.
+  New pins: `["Question", answer, "unit", kind, "g"]`.
+- Krillion-sized lists: new prompts need at least 150 answers (aim 200+); obvious answers score badly, niche-but-correct ones well.
+  Closed lists (champions, Ryder Cup teams) must be COMPLETE for a stated date range and at least 40 answers.
+- Open-ended prompts must be GENEROUS: sub-brands, variants, old models, nicknames and aliases. Felix reports any valid answer
+  that scores as a lost ball. When in doubt, accept it (append near the end of the list).
+- Stock yardages / lofts vary, so phrase them "typically/roughly" and use generous band arrays.
+- Retire a prompt that turns out bad by adding its id to `RETIRED` at the bottom of `src/rare.js` (never delete it).
 
 ## Hard rules
 - NEVER change today's or tomorrow's course (UK time) or any past date in `src/schedule.js`. Players share results by course number.
@@ -46,7 +45,7 @@ The skill is in going niche: obvious answers are a bogey, obscure-but-correct on
 
 ## Daily routine (scheduled job)
 1. `python3 build.py && node tools/check.js` — confirm the repo is healthy first.
-2. Write new content (Krillion-style difficulty, see above): append 2 new rare-find prompts to `HAND` in `src/rare.js` and 3 new questions to the end of `PINS` in
+2. Write new GOLF content (see GOLF ONLY above): append 2 new golf rare-find prompts to `HAND` in `src/rare.js` (plus their `GOLF_FAM` entries) and 3 new golf questions (5th field `"g"`) to the end of `PINS` in
    `src/pins.js`. Read both files first so nothing duplicates an existing prompt or question. Use new unique ids. Assign a
    family where it clearly overlaps an existing group (see `famOf` in `src/body.html`).
 3. `python3 build.py && node tools/extend_schedule.js --ahead 60 && python3 build.py && node tools/check.js`

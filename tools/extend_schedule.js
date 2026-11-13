@@ -17,7 +17,8 @@ const lastUse={}; dates.forEach((d,i)=>S[d].forEach(id=>lastUse[id]=G.dayIndex(d
 const order={}; [...G.RARE_ALL,...G.PIN_ALL].forEach((x,i)=>order[x.id]=i);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 function pick(pool,day,count,gaps,famCheck,key){
-  for(const gap of gaps){
+  // Last resort (small golf-only pool): allow two prompts from one family on a day rather than fail.
+  for(const [gap,fc] of [...gaps.map(g=>[g,famCheck]), ...(famCheck?[[gaps[gaps.length-1],false]]:[])]){ famCheck=fc;
     const cands=pool.filter(x=>lastUse[x.id]==null||day-lastUse[x.id]>=gap)
       .sort((a,b)=>((lastUse[a.id]??-1e9)-(lastUse[b.id]??-1e9))||((lastUse[a.id]==null&&lastUse[b.id]==null)?(order[b.id]-order[a.id]):0)||(hash(key+a.id)-hash(key+b.id)));
     const out=[], fams=new Set();
@@ -27,7 +28,7 @@ function pick(pool,day,count,gaps,famCheck,key){
 }
 for(let k=0;k<N;k++){
   last=G.addDays(last,1); const day=G.dayIndex(last);
-  const themed=G.RARE_ALL.filter(x=>x.theme===last.slice(5));
+  const themed=G.RARE_ALL.filter(x=>x.theme===last.slice(5) && (!G.GOLF_ONLY||G.isGolfRare(x)));
   const rare=[...themed, ...pick(G.RARE_POOL,day,6-themed.length,[21,14,7],true,last)].slice(0,6);
   const pins=pick(G.PIN_POOL,day,3,[60,30,14],false,last);
   let ri=0,pi=0; S[last]=G.LAYOUT.map(t=>t==="R"?rare[ri++].id:pins[pi++].id);
