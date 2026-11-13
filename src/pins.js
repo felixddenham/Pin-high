@@ -296,5 +296,8 @@ const PINS = [
 ["What loft is a typical men's driver, roughly, in degrees?", 10, "°", [0.5, 1, 2, 3, 5, 8], "g"],
 ["In what year did Alan Shepard hit golf balls on the Moon?", 1971, "", "y", "g"],
 ["In what year did Greg Norman blow a six-shot final-round lead to Nick Faldo at the Masters?", 1996, "", "y", "g"],
-["How many men's majors did Seve Ballesteros win?", 5, "majors", [0, 1, 2, 3, 4, 6], "g"]
+["How many men's majors did Seve Ballesteros win?", 5, "majors", [0, 1, 2, 3, 4, 6], "g"],
+["In what year was the Royal and Ancient Golf Club founded at St Andrews (as the Society of St Andrews Golfers)?", 1754, "", "y", "g"],
+["How many Open Championships did Tom Watson win?", 5, "Opens", [0, 1, 2, 3, 4, 6], "g"],
+["In what year was the first Players Championship played?", 1974, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
