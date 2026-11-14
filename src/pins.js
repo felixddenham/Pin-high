@@ -299,5 +299,8 @@ const PINS = [
 ["How many men's majors did Seve Ballesteros win?", 5, "majors", [0, 1, 2, 3, 4, 6], "g"],
 ["In what year was the Royal and Ancient Golf Club founded at St Andrews (as the Society of St Andrews Golfers)?", 1754, "", "y", "g"],
 ["How many Open Championships did Tom Watson win?", 5, "Opens", [0, 1, 2, 3, 4, 6], "g"],
-["In what year was the first Players Championship played?", 1974, "", "y", "g"]
+["In what year was the first Players Championship played?", 1974, "", "y", "g"],
+["In what year did Seve Ballesteros win his first Masters?", 1980, "", "y", "g"],
+["How many Ryder Cups did Nick Faldo play in as a player?", 11, "Ryder Cups", [0, 1, 2, 3, 5, 8], "g"],
+["In what year did Padraig Harrington win his first Open, at Carnoustie?", 2007, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
