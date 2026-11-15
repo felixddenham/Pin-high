@@ -302,5 +302,8 @@ const PINS = [
 ["In what year was the first Players Championship played?", 1974, "", "y", "g"],
 ["In what year did Seve Ballesteros win his first Masters?", 1980, "", "y", "g"],
 ["How many Ryder Cups did Nick Faldo play in as a player?", 11, "Ryder Cups", [0, 1, 2, 3, 5, 8], "g"],
-["In what year did Padraig Harrington win his first Open, at Carnoustie?", 2007, "", "y", "g"]
+["In what year did Padraig Harrington win his first Open, at Carnoustie?", 2007, "", "y", "g"],
+["In what year did Gene Sarazen hole his famous albatross on the 15th at Augusta, the 'shot heard round the world'?", 1935, "", "y", "g"],
+["In what year did Sandy Lyle win the Masters?", 1988, "", "y", "g"],
+["How many men's major championships did Nick Faldo win?", 6, "majors", [0, 1, 2, 3, 4, 6], "g"]
 ].filter(q=>q[3]!=="skip");
