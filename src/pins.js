@@ -308,5 +308,8 @@ const PINS = [
 ["How many men's major championships did Nick Faldo win?", 6, "majors", [0, 1, 2, 3, 4, 6], "g"],
 ["In what year did Tony Jacklin win the US Open at Hazeltine?", 1970, "", "y", "g"],
 ["In what year did Sam Torrance captain Europe to Ryder Cup victory at The Belfry?", 2002, "", "y", "g"],
-["How many men's major championships did Gary Player win?", 9, "majors", [0, 1, 2, 3, 4, 6], "g"]
+["How many men's major championships did Gary Player win?", 9, "majors", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Ian Woosnam win the Masters?", 1991, "", "y", "g"],
+["How many holes did Tiger Woods and Rocco Mediate play in their 2008 US Open play-off, including sudden death?", 19, "holes", [0, 1, 2, 4, 6, 10], "g"],
+["In what year did Laura Davies win the US Women's Open?", 1987, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
