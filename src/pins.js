@@ -311,5 +311,8 @@ const PINS = [
 ["How many men's major championships did Gary Player win?", 9, "majors", [0, 1, 2, 3, 4, 6], "g"],
 ["In what year did Ian Woosnam win the Masters?", 1991, "", "y", "g"],
 ["How many holes did Tiger Woods and Rocco Mediate play in their 2008 US Open play-off, including sudden death?", 19, "holes", [0, 1, 2, 4, 6, 10], "g"],
-["In what year did Laura Davies win the US Women's Open?", 1987, "", "y", "g"]
+["In what year did Laura Davies win the US Women's Open?", 1987, "", "y", "g"],
+["In what year did Graeme McDowell win the US Open at Pebble Beach?", 2010, "", "y", "g"],
+["How old was Young Tom Morris when he won his first Open Championship in 1868?", 17, "years old", [0, 1, 2, 3, 5, 8], "g"],
+["How long is the island-green 17th at TPC Sawgrass, roughly, in yards?", 137, "yards", [0, 5, 12, 25, 45, 80], "g"]
 ].filter(q=>q[3]!=="skip");
