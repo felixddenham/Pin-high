@@ -314,5 +314,8 @@ const PINS = [
 ["In what year did Laura Davies win the US Women's Open?", 1987, "", "y", "g"],
 ["In what year did Graeme McDowell win the US Open at Pebble Beach?", 2010, "", "y", "g"],
 ["How old was Young Tom Morris when he won his first Open Championship in 1868?", 17, "years old", [0, 1, 2, 3, 5, 8], "g"],
-["How long is the island-green 17th at TPC Sawgrass, roughly, in yards?", 137, "yards", [0, 5, 12, 25, 45, 80], "g"]
+["How long is the island-green 17th at TPC Sawgrass, roughly, in yards?", 137, "yards", [0, 5, 12, 25, 45, 80], "g"],
+["In what year did Tom Watson beat Jack Nicklaus in the 'Duel in the Sun' Open at Turnberry?", 1977, "", "y", "g"],
+["What loft is a typical 3-wood, roughly, in degrees?", 15, "°", [0.5, 1, 2, 3, 5, 8], "g"],
+["In what year was the first Walker Cup (amateur, GB & Ireland v USA) played?", 1922, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
