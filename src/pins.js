@@ -317,5 +317,8 @@ const PINS = [
 ["How long is the island-green 17th at TPC Sawgrass, roughly, in yards?", 137, "yards", [0, 5, 12, 25, 45, 80], "g"],
 ["In what year did Tom Watson beat Jack Nicklaus in the 'Duel in the Sun' Open at Turnberry?", 1977, "", "y", "g"],
 ["What loft is a typical 3-wood, roughly, in degrees?", 15, "°", [0.5, 1, 2, 3, 5, 8], "g"],
-["In what year was the first Walker Cup (amateur, GB & Ireland v USA) played?", 1922, "", "y", "g"]
+["In what year was the first Walker Cup (amateur, GB & Ireland v USA) played?", 1922, "", "y", "g"],
+["In what year did Bernhard Langer win his first Masters?", 1985, "", "y", "g"],
+["How many Masters titles did Arnold Palmer win?", 4, "titles", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Rory McIlroy win the Open at Royal Liverpool (Hoylake)?", 2014, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
