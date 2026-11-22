@@ -323,5 +323,8 @@ const PINS = [
 ["In what year did Rory McIlroy win the Open at Royal Liverpool (Hoylake)?", 2014, "", "y", "g"],
 ["In what year did Nick Faldo win his first Open Championship, at Muirfield?", 1987, "", "y", "g"],
 ["In what year did Darren Clarke win the Open at Royal St George's?", 2011, "", "y", "g"],
-["In what year did Catriona Matthew captain Europe to Solheim Cup victory at Gleneagles?", 2019, "", "y", "g"]
+["In what year did Catriona Matthew captain Europe to Solheim Cup victory at Gleneagles?", 2019, "", "y", "g"],
+["In what year did the K Club in Ireland host the Ryder Cup?", 2006, "", "y", "g"],
+["By how many shots did Tiger Woods win the 2000 Open at St Andrews?", 8, "shots", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Henrik Stenson win the Open at Royal Troon?", 2016, "", "y", "g"]
 ].filter(q=>q[3]!=="skip");
