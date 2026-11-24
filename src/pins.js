@@ -329,5 +329,8 @@ const PINS = [
 ["In what year did Henrik Stenson win the Open at Royal Troon?", 2016, "", "y", "g"],
 ["In what year did Ernie Els win his first Open Championship, at Muirfield?", 2002, "", "y", "g"],
 ["In what year did Greg Norman win his first Open Championship, at Turnberry?", 1986, "", "y", "g"],
-["How many times did Colin Montgomerie top the European Tour Order of Merit?", 8, "times", [0, 1, 2, 3, 4, 6], "g"]
+["How many times did Colin Montgomerie top the European Tour Order of Merit?", 8, "times", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Seve Ballesteros win his second Open Championship, at St Andrews?", 1984, "", "y", "g"],
+["In what year did Tom Watson win his first Open Championship, at Carnoustie?", 1975, "", "y", "g"],
+["How many men's major championships did Walter Hagen win?", 11, "majors", [0, 1, 2, 3, 4, 6], "g"],
 ].filter(q=>q[3]!=="skip");
