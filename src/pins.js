@@ -333,4 +333,7 @@ const PINS = [
 ["In what year did Seve Ballesteros win his second Open Championship, at St Andrews?", 1984, "", "y", "g"],
 ["In what year did Tom Watson win his first Open Championship, at Carnoustie?", 1975, "", "y", "g"],
 ["How many men's major championships did Walter Hagen win?", 11, "majors", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Europe first win the Solheim Cup, at Dalmahoy?", 1992, "", "y", "g"],
+["How many Open Championships had Carnoustie hosted up to the end of 2025?", 8, "Opens", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Jack Nicklaus win his first Open Championship, at Muirfield?", 1966, "", "y", "g"],
 ].filter(q=>q[3]!=="skip");
