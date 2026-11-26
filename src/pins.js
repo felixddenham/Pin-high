@@ -336,4 +336,7 @@ const PINS = [
 ["In what year did Europe first win the Solheim Cup, at Dalmahoy?", 1992, "", "y", "g"],
 ["How many Open Championships had Carnoustie hosted up to the end of 2025?", 8, "Opens", [0, 1, 2, 3, 4, 6], "g"],
 ["In what year did Jack Nicklaus win his first Open Championship, at Muirfield?", 1966, "", "y", "g"],
+["How many Open Championships did Peter Thomson win?", 5, "Opens", [0, 1, 2, 3, 4, 6], "g"],
+["In what year did Royal Portrush first host the Open Championship (won by Max Faulkner)?", 1951, "", "y", "g"],
+["In what year did Sandy Lyle win the Open at Royal St George's?", 1985, "", "y", "g"],
 ].filter(q=>q[3]!=="skip");
