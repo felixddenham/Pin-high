@@ -339,4 +339,7 @@ const PINS = [
 ["How many Open Championships did Peter Thomson win?", 5, "Opens", [0, 1, 2, 3, 4, 6], "g"],
 ["In what year did Royal Portrush first host the Open Championship (won by Max Faulkner)?", 1951, "", "y", "g"],
 ["In what year did Sandy Lyle win the Open at Royal St George's?", 1985, "", "y", "g"],
+["In what year did Jordan Spieth win the Open at Royal Birkdale?", 2017, "", "y", "g"],
+["In what year did Phil Mickelson win the Open at Muirfield?", 2013, "", "y", "g"],
+["How old was Gene Sarazen when he holed in one at the 'Postage Stamp' 8th at Royal Troon in the 1973 Open?", 71, "years old", [0, 1, 2, 3, 5, 8], "g"],
 ].filter(q=>q[3]!=="skip");
